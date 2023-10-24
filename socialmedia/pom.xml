@@ -9,13 +9,13 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.cooksys</groupId>
-	<artifactId>lemonadestand</artifactId>
+	<artifactId>socialmedia</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>lemonadestand</name>
-	<description>A basic API for our cooksys lemonadestand</description>
+	<name>socialmedia</name>
+	<description>socialmedia group project</description>
 	<properties>
 		<java.version>11</java.version>
-		<org.mapstruct.version>1.2.0.Final</org.mapstruct.version>
+		<org.mapstruct.version>1.4.2.Final</org.mapstruct.version>
 		<org.projectlombok.version>1.18.16</org.projectlombok.version>
 	</properties>
 	<dependencies>
@@ -52,7 +52,7 @@
 		<dependency>
 			<groupId>org.mapstruct</groupId>
 			<artifactId>mapstruct</artifactId>
-			<version>1.5.3.Final</version>
+			<version>1.4.2.Final</version>
 		</dependency>
 	</dependencies>
 
@@ -82,13 +82,11 @@
 							<artifactId>lombok</artifactId>
 							<version>${org.projectlombok.version}</version>
 						</path>
-						<!-- This is needed when using Lombok 1.18.16 and above -->
 						<path>
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok-mapstruct-binding</artifactId>
 							<version>0.2.0</version>
 						</path>
-						<!-- Mapstruct should follow the lombok path(s) -->
 						<path>
 							<groupId>org.mapstruct</groupId>
 							<artifactId>mapstruct-processor</artifactId>
@@ -97,8 +95,6 @@
 					</annotationProcessorPaths>
 				</configuration>
 			</plugin>
-
 		</plugins>
 	</build>
-
 </project>
