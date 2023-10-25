@@ -26,7 +26,7 @@ public class Hashtag {
     @Column(nullable = false)
     private Timestamp lastUsed;
 
-    @OneToMany (mappedBy = "hashtag")
-    private List<Integer> tweets;
+//    @OneToMany (mappedBy = "hashtag")
+//    private List<Integer> tweets;
 
 }

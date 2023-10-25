@@ -18,10 +18,10 @@ public class User {
     @GeneratedValue
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, insertable = false, updatable = false)
     private String username;
 
-    @Column(nullable = false)
+    @Column(nullable = false, insertable = false, updatable = false)
     private String password;
 
     @Column(nullable = false)
@@ -36,14 +36,14 @@ public class User {
     @Embedded
     private Credentials credentials;
 
-    @OneToMany (mappedBy = "user")
-    private List<Integer> followers;
-
-    @OneToMany (mappedBy = "user")
-    private List<Integer> followings;
-
-    @OneToMany (mappedBy = "tweet")
-    private List<Tweet> tweets;
+//    @OneToMany (mappedBy = "user")
+//    private List<Integer> followers;
+//
+//    @OneToMany (mappedBy = "user")
+//    private List<Integer> followings;
+//
+//    @OneToMany (mappedBy = "tweet")
+//    private List<Tweet> tweets;
 
 
 

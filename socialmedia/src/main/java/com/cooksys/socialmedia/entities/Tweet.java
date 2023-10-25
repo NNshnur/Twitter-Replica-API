@@ -29,17 +29,17 @@ public class Tweet {
     @Column
     private String content;
 
-    @ManyToOne
-    private Tweet inReplyTo;
+//    @ManyToOne
+//    private Tweet inReplyTo;
+//
+//    @ManyToOne
+//    private Tweet repostOf;
 
-    @ManyToOne
-    private Tweet repostOf;
-
-    @OneToMany (mappedBy = "tweet")
-    private List<Integer> userLikes;
-
-    @OneToMany (mappedBy = "tweet")
-    private List<Integer> userMentions;
+//    @OneToMany (mappedBy = "tweet")
+//    private List<Integer> userLikes;
+//
+//    @OneToMany (mappedBy = "tweet")
+//    private List<Integer> userMentions;
 
 
 
