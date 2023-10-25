@@ -9,9 +9,4 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping ("/tweets")
 public class TweetController {
-
-    private final TweetService tweetService;
-
-
-
 }
