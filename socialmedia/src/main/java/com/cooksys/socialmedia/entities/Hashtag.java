@@ -3,9 +3,12 @@ package com.cooksys.socialmedia.entities;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -20,13 +23,13 @@ public class Hashtag {
     @Column(nullable = false, unique = true)
     private String label;
 
-    @Column(nullable = false)
+    @CreationTimestamp
     private Timestamp firstUsed;
 
-    @Column(nullable = false)
+    @UpdateTimestamp
     private Timestamp lastUsed;
 
-//    @OneToMany (mappedBy = "hashtag")
-//    private List<Integer> tweets;
+    @ManyToMany (mappedBy = "hashtags")
+    private List<Tweet> tweets = new ArrayList<>();
 
 }

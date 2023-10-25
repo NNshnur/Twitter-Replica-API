@@ -6,7 +6,7 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class Credentials {
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String username;
 
     @Column (nullable = false)
