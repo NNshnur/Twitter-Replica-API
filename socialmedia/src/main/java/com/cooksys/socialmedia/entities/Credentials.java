@@ -11,4 +11,10 @@ public class Credentials {
 
     @Column (nullable = false)
     private String password;
+
+    public void setUsername(String tarnished) {
+    }
+
+    public void setPassword(String password) {
+    }
 }
