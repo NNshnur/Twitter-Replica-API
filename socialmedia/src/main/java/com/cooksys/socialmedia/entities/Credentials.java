@@ -15,6 +15,6 @@ public class Credentials {
     public void setUsername(String tarnished) {
     }
 
-    public void setPassword(String password) {
+    public void setPassword(java.lang.String password) {
     }
 }
