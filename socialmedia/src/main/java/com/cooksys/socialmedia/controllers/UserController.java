@@ -1,6 +1,7 @@
 package com.cooksys.socialmedia.controllers;
 
 import com.cooksys.socialmedia.dto.CredentialsDto;
+import com.cooksys.socialmedia.dto.TweetResponseDto;
 import com.cooksys.socialmedia.dto.UserResponseDto;
 import com.cooksys.socialmedia.services.UserService;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +30,11 @@ public class UserController {
     @PostMapping("/{username}/unfollow")
     public UserResponseDto unFollowUser(@PathVariable String username, @RequestBody CredentialsDto credentialsDto) {
         return userService.unFollowUser(credentialsDto, username);
+    }
+
+    @GetMapping("/{username}/feed")
+    public List<TweetResponseDto> getUserFeed(@PathVariable String username) {
+        return userService.getUserFeed(username);
     }
 
 }
