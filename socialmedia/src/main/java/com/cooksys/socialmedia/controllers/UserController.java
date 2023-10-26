@@ -26,5 +26,9 @@ public class UserController {
         return userService.followUser(credentialsDto, username);
     }
 
+    @PostMapping("/{username}/unfollow")
+    public UserResponseDto unFollowUser(@PathVariable String username, @RequestBody CredentialsDto credentialsDto) {
+        return userService.unFollowUser(credentialsDto, username);
+    }
 
 }

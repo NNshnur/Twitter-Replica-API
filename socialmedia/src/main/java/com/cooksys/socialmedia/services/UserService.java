@@ -9,4 +9,6 @@ public interface UserService {
     List<UserResponseDto> getAllUsers();
 
     UserResponseDto followUser(CredentialsDto credentialsDto, String username);
+
+    UserResponseDto unFollowUser(CredentialsDto credentialsDto, String username);
 }

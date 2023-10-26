@@ -53,8 +53,33 @@ public class UserServiceImpl implements UserService {
         }
 
         user.getFollowing().add(userToFollow);
-        userRepository.save(user);
+        userToFollow.getFollowers().add(user);
+        userRepository.saveAndFlush(user);
 
         return userMapper.entityToResponseDto(userToFollow);
     }
-}
+
+    @Override
+    public UserResponseDto unFollowUser(CredentialsDto credentialsDto, String username) {
+        User user = validateCredentials(credentialsDto);
+
+        if (user == null) {
+            throw new NotAuthorizedException("User is invalid");
+        }
+
+        User userToUnfollow = userRepository.findByCredentialsUsernameAndDeletedFalse(username);
+        if(userToUnfollow == null) {
+            throw new NotFoundException("User to unfollow was not found");
+        }
+        if(!user.getFollowing().contains(userToUnfollow)) {
+            throw new BadRequestException("User is not following that user");
+        }
+
+        user.getFollowing().remove(userToUnfollow);
+        userToUnfollow.getFollowers().remove(user);
+        userRepository.saveAndFlush(user);
+
+        return userMapper.entityToResponseDto(userToUnfollow);
+        }
+    }
+
