@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface UserMapper {
     @Mapping(target = "username", source = "credentials.username")
-    UserResponseDto entityToDto(User user);
+    UserResponseDto entityToResponseDto(User user);
 
 
     List<UserResponseDto> entitiesToResponseDtos(List<User> users);

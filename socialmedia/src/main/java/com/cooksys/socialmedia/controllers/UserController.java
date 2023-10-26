@@ -1,10 +1,9 @@
 package com.cooksys.socialmedia.controllers;
 
+import com.cooksys.socialmedia.dto.CredentialsDto;
 import com.cooksys.socialmedia.dto.UserResponseDto;
 import com.cooksys.socialmedia.services.UserService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import lombok.RequiredArgsConstructor;
 
@@ -21,4 +20,11 @@ public class UserController {
     public List<UserResponseDto> getAllUsers() {
         return userService.getAllUsers();
     }
+
+    @PostMapping("/{username}/follow")
+    public UserResponseDto followUser(@PathVariable String username, @RequestBody CredentialsDto credentialsDto) {
+        return userService.followUser(credentialsDto, username);
+    }
+
+
 }
