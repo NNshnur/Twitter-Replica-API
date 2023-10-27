@@ -2,16 +2,21 @@ package com.cooksys.socialmedia.services.impl;
 
 import com.cooksys.socialmedia.dto.CredentialsDto;
 import com.cooksys.socialmedia.dto.ProfileDto;
+import com.cooksys.socialmedia.dto.TweetResponseDto;
 import com.cooksys.socialmedia.entities.Credentials;
 import com.cooksys.socialmedia.entities.Profile;
+import com.cooksys.socialmedia.entities.Tweet;
 import com.cooksys.socialmedia.entities.User;
 import com.cooksys.socialmedia.exceptions.NotFoundException;
+import com.cooksys.socialmedia.mappers.TweetMapper;
 import com.cooksys.socialmedia.mappers.UserMapper;
+import com.cooksys.socialmedia.repositories.TweetRepository;
 import com.cooksys.socialmedia.repositories.UserRepository;
 import com.cooksys.socialmedia.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -22,6 +27,10 @@ public class UserServiceImpl implements UserService {
 
     private final UserMapper userMapper;
 
+    private final TweetMapper tweetMapper;
+
+    private final TweetRepository tweetRepository;
+
     public boolean usernameExists(String username) {
         List<User> allUsers = userRepository.findAll();
         for (User u : allUsers) {
@@ -30,6 +39,18 @@ public class UserServiceImpl implements UserService {
             }
         }
         return false;
+    }
+
+    public List<TweetResponseDto> getAllTweetsByUser(String username) {
+        List<User> allUsers = userRepository.findAll();
+        for (User u : allUsers) {
+            if (u.getCredentials().getUsername().equals(username)) {
+                List<Tweet> usersTweets = u.getTweets();
+                return tweetMapper.tweetEntitiesToResponseDtos(usersTweets);
+            }
+        }
+       List<TweetResponseDto> tweets = new ArrayList<>();
+        return tweets;
     }
 
     public User deleteUser(CredentialsDto credentialsDto) {
