@@ -6,5 +6,7 @@ public interface ValidateService {
 	
 	boolean tagExists(String label);
 
+	public boolean usernameExists(String username);
+
 }
 

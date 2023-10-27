@@ -5,7 +5,6 @@ import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-
 import com.cooksys.socialmedia.dto.UserRequestDto;
 import com.cooksys.socialmedia.dto.UserResponseDto;
 import com.cooksys.socialmedia.entities.User;

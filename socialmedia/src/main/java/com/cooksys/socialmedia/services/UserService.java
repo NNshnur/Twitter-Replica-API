@@ -1,29 +1,36 @@
 package com.cooksys.socialmedia.services;
 
 
-import java.util.List;
-
+import com.cooksys.socialmedia.dto.CredentialsDto;
+import com.cooksys.socialmedia.dto.ProfileDto;
+import com.cooksys.socialmedia.dto.TweetResponseDto;
+import com.cooksys.socialmedia.entities.User;
 import com.cooksys.socialmedia.dto.TweetResponseDto;
 import com.cooksys.socialmedia.dto.UserRequestDto;
 import com.cooksys.socialmedia.dto.UserResponseDto;
-import com.cooksys.socialmedia.dto.CredentialsDto;
+import java.util.List;
 
 public interface UserService {
-	
-	UserResponseDto createUser(UserRequestDto userRequestDto);
-	
-	List<UserResponseDto> getUserFollowers(String username);
-	
-	List<UserResponseDto> getUserFollowing(String username);
-	
-	List<TweetResponseDto> getUserMentions(String username);
+    public User updateUserProfile(CredentialsDto credentialsDto, ProfileDto profileDto);
 
-  List<UserResponseDto> getAllUsers();
+    public User deleteUser(CredentialsDto credentialsDto);
 
-   UserResponseDto followUser(CredentialsDto credentialsDto, String username);
+    public List<TweetResponseDto> getAllTweetsByUser(String username);
+	
+	  UserResponseDto createUser(UserRequestDto userRequestDto);
+	
+	  List<UserResponseDto> getUserFollowers(String username);
+	
+	  List<UserResponseDto> getUserFollowing(String username);
+	
+  	List<TweetResponseDto> getUserMentions(String username);
 
-   UserResponseDto unFollowUser(CredentialsDto credentialsDto, String username);
+    List<UserResponseDto> getAllUsers();
 
-   List<TweetResponseDto> getUserFeed(String username);
+    UserResponseDto followUser(CredentialsDto credentialsDto, String username);
+
+    UserResponseDto unFollowUser(CredentialsDto credentialsDto, String username);
+
+     List<TweetResponseDto> getUserFeed(String username);
 
 }

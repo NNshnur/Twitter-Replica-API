@@ -9,7 +9,6 @@ import java.sql.Timestamp;
 @Data
 public class HashtagDto {
     private String label;
-
     private Timestamp firstUsed;
     private Timestamp lastUsed;
 }

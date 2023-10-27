@@ -8,4 +8,5 @@ import com.cooksys.socialmedia.entities.Credentials;
 @Mapper(componentModel="spring")
 public interface CredentialsMapper {
 	Credentials dtoToEntity(CredentialsDto credentialsDto);
+
 }
