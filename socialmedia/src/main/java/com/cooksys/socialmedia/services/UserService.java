@@ -11,7 +11,7 @@ import com.cooksys.socialmedia.dto.UserResponseDto;
 import java.util.List;
 
 public interface UserService {
-    public User updateUserProfile(CredentialsDto credentialsDto, ProfileDto profileDto, String name);
+    public User updateUserProfile(UserRequestDto userRequestDto, String name);
 
     public User deleteUser(CredentialsDto credentialsDto);
 

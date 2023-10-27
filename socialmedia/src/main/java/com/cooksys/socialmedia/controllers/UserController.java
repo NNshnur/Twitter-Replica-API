@@ -30,8 +30,8 @@ public class UserController {
 
     private final UserService userService;
 
-    @PatchMapping("/@{username}") public User updateUsername(@RequestBody CredentialsDto credentialsDto, @RequestBody ProfileDto profileDto, @PathVariable String username) {
-        return userService.updateUserProfile(credentialsDto, profileDto, username);
+    @PatchMapping("/@{username}") public User updateUsername(@RequestBody UserRequestDto userRequestDto, @PathVariable String username) {
+        return userService.updateUserProfile(userRequestDto, username);
     }
 
     @DeleteMapping("/@{username}") public User deleteUser(@RequestBody CredentialsDto credentialsDto, @PathVariable String username) {
