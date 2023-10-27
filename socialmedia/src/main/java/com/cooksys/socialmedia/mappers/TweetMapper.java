@@ -12,4 +12,12 @@ import java.util.Optional;
 public interface TweetMapper {
     @Mapping(target="content", source="content") TweetResponseDto tweetEntityToResponseDto(Tweet entity);
     List<TweetResponseDto> tweetEntitiesToResponseDtos(List<Tweet> entities);
+
+   TweetResponseDto entityToResponseDto(Tweet tweet);
+
+	  List<TweetResponseDto> entitiesToDtos(List<Tweet> tweets);
+
+    @Mapping(target="content", source = "content")
+    List<TweetResponseDto> entitiesToResponseDtos(List<Tweet> allTweets);
+
 }

@@ -1,10 +1,12 @@
 package com.cooksys.socialmedia.controllers;
 
-import com.cooksys.socialmedia.dto.*;
 import com.cooksys.socialmedia.entities.Hashtag;
 import com.cooksys.socialmedia.entities.Tweet;
 import com.cooksys.socialmedia.entities.User;
 import com.cooksys.socialmedia.services.HashtagService;
+import com.cooksys.socialmedia.dto.TweetRequestDto;
+import com.cooksys.socialmedia.dto.TweetResponseDto;
+import com.cooksys.socialmedia.dto.UserResponseDto;
 import com.cooksys.socialmedia.services.TweetService;
 import com.cooksys.socialmedia.services.UserService;
 import lombok.Generated;
@@ -14,12 +16,14 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping ("/tweets")
 public class TweetController {
 
     private final TweetService tweetService;
+
     private final UserService userService;
 
     private final HashtagService hashtagService;
@@ -57,6 +61,21 @@ public class TweetController {
     @PostMapping("/{id}/repost")
     public TweetResponseDto repostTweet(@PathVariable Long id, @RequestBody CredentialsDto credentialsDto) {
         return tweetService.createRepost(id, credentialsDto);
+    }
+
+    @GetMapping("/{id}/reposts")
+    public List<TweetResponseDto> getRepostsOfTweet(@PathVariable Long id) {
+        return tweetService.getRepostsOfTweet(id);
+    }
+
+    @GetMapping("/{id}/mentions")
+    public List<UserResponseDto> getUsersMentioned(@PathVariable Long id) {
+        return tweetService.getUsersMentioned(id);
+    }
+
+    @PostMapping("/{id}/reply")
+    public TweetResponseDto createTweetReply(@PathVariable Long id, @RequestBody TweetRequestDto tweetRequestDto) {
+        return tweetService.createTweetReply(id, tweetRequestDto);
     }
 
 }
