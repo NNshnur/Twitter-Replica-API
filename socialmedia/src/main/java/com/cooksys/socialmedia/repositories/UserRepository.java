@@ -8,9 +8,11 @@ import java.util.List;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
+
     List<User> findByDeletedFalse();
 
     boolean existsByCredentialsUsername(String username);
 
     User findByCredentialsUsernameAndDeletedFalse(String username);
+
 }

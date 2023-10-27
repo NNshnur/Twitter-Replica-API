@@ -1,5 +1,10 @@
 package com.cooksys.socialmedia.services;
 
 public interface ValidateService {
-    boolean isUsernameAvailable(String username);
+
+  boolean isUsernameAvailable(String username);
+	
+	boolean tagExists(String label);
+
 }
+
