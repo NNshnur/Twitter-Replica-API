@@ -25,7 +25,6 @@ public class Tweet {
    @CreationTimestamp
     private Timestamp posted;
 
-
     private boolean deleted = false;
 
     private String content;
@@ -35,6 +34,7 @@ public class Tweet {
 
     @OneToMany(mappedBy = "inReplyTo")
     private List<Tweet> replies = new ArrayList<>();
+    
     @ManyToOne
     private Tweet repostOf;
 
@@ -59,8 +59,5 @@ public class Tweet {
             inverseJoinColumns = @JoinColumn(name = "hashtag_id")
     )
     private List<Hashtag> hashtags = new ArrayList<>();
-
-
-
 
 }
