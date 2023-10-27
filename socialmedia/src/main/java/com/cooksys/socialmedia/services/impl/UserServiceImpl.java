@@ -5,12 +5,14 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.cooksys.socialmedia.dto.TweetResponseDto;
 import com.cooksys.socialmedia.dto.UserRequestDto;
 import com.cooksys.socialmedia.dto.UserResponseDto;
 import com.cooksys.socialmedia.entities.Tweet;
 import com.cooksys.socialmedia.entities.User;
 import com.cooksys.socialmedia.exceptions.BadRequestException;
 import com.cooksys.socialmedia.exceptions.NotFoundException;
+import com.cooksys.socialmedia.mappers.TweetMapper;
 import com.cooksys.socialmedia.mappers.UserMapper;
 import com.cooksys.socialmedia.repositories.UserRepository;
 import com.cooksys.socialmedia.services.UserService;
@@ -24,6 +26,8 @@ public class UserServiceImpl implements UserService {
 	private final UserRepository userRepository;
 
 	private final UserMapper userMapper;
+	
+	private final TweetMapper tweetMapper;
 
 	private void validateUserRequest(UserRequestDto userRequestDto) {
 		if (userRequestDto.getProfile() == null || userRequestDto.getCredentials() == null) {
@@ -94,20 +98,24 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public List<User> getUserFollowers(String username) {
+	public List<UserResponseDto> getUserFollowers(String username) {
 		User user = activeUser(username);
-		return user.getFollowers();
+		// go through repository
+		List<User> followers = user.getFollowers();
+		return userMapper.entitiesToDtos(followers);
 	}
 
 	@Override
-	public List<User> getUserFollowing(String username) {
+	public List<UserResponseDto> getUserFollowing(String username) {
 		User user = activeUser(username);
-		return user.getFollowing();
+		List<User> following = user.getFollowing();
+		return userMapper.entitiesToDtos(following);
 	}
 
 	@Override
-	public List<Tweet> getUserMentions(String username) {
+	public List<TweetResponseDto> getUserMentions(String username) {
 		User user = activeUser(username);
-		return user.getMentionedTweets();
+		List<Tweet> tweets = user.getMentionedTweets();
+		return tweetMapper.entitiesToDtos(tweets);
 	}
 }

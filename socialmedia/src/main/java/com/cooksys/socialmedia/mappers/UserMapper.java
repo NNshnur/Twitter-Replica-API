@@ -1,5 +1,7 @@
 package com.cooksys.socialmedia.mappers;
 
+import java.util.List;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -14,4 +16,6 @@ public interface UserMapper {
     UserResponseDto entityToDto(User entity);
     
     User dtoToEntity(UserRequestDto dto);
+    
+    List<UserResponseDto> entitiesToDtos(List<User> users);
 }
