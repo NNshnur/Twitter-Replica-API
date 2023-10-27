@@ -1,19 +1,17 @@
 package com.cooksys.socialmedia.services.impl;
 
 import com.cooksys.socialmedia.dto.TweetRequestDto;
-import com.cooksys.socialmedia.dto.TweetResponseDto;
 import com.cooksys.socialmedia.dto.UserResponseDto;
 import com.cooksys.socialmedia.entities.Tweet;
 import com.cooksys.socialmedia.entities.User;
 import com.cooksys.socialmedia.exceptions.NotFoundException;
+import org.springframework.stereotype.Service;
 import com.cooksys.socialmedia.mappers.TweetMapper;
 import com.cooksys.socialmedia.mappers.UserMapper;
 import com.cooksys.socialmedia.repositories.TweetRepository;
 import com.cooksys.socialmedia.repositories.UserRepository;
 import com.cooksys.socialmedia.services.TweetService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
