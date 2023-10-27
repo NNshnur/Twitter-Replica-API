@@ -1,5 +1,6 @@
 package com.cooksys.socialmedia.controllers;
 
+import com.cooksys.socialmedia.dto.HashtagResponseDto;
 import com.cooksys.socialmedia.dto.TweetResponseDto;
 import com.cooksys.socialmedia.dto.UserResponseDto;
 import com.cooksys.socialmedia.entities.Hashtag;
@@ -43,7 +44,7 @@ public class TweetController {
     }
 
     @GetMapping("/{id}/tags")
-    public List<Hashtag> findAllTagsForTweet(@PathVariable Long id) {
+    public List<HashtagResponseDto> findAllTagsForTweet(@PathVariable Long id) {
         return tweetService.getAllTagsFromTweet(id);
     }
 

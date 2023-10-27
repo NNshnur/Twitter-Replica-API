@@ -1,13 +1,16 @@
 package com.cooksys.socialmedia.services.impl;
 
+import com.cooksys.socialmedia.dto.HashtagResponseDto;
 import com.cooksys.socialmedia.dto.TweetResponseDto;
 import com.cooksys.socialmedia.dto.UserResponseDto;
 import com.cooksys.socialmedia.entities.Hashtag;
 import com.cooksys.socialmedia.entities.Tweet;
 import com.cooksys.socialmedia.entities.User;
 import com.cooksys.socialmedia.exceptions.NotFoundException;
+import com.cooksys.socialmedia.mappers.HashtagMapper;
 import com.cooksys.socialmedia.mappers.TweetMapper;
 import com.cooksys.socialmedia.mappers.UserMapper;
+import com.cooksys.socialmedia.repositories.HashtagRepository;
 import com.cooksys.socialmedia.repositories.TweetRepository;
 import com.cooksys.socialmedia.repositories.UserRepository;
 import com.cooksys.socialmedia.services.TweetService;
@@ -29,6 +32,10 @@ public class TweetServiceImpl implements TweetService {
     private final UserRepository userRepository;
 
     private final UserMapper userMapper;
+
+    private final HashtagRepository hashtagRepository;
+
+    private final HashtagMapper hashtagMapper;
 
 //    public Optional<Tweet> findTweetById(Long Id) {
 //        return tweetRepository.findById(Id);
@@ -81,10 +88,16 @@ public class TweetServiceImpl implements TweetService {
 
     }
 
-    public List<Hashtag> getAllTagsFromTweet(Long id) {
+    public List<HashtagResponseDto> getAllTagsFromTweet(Long id) {
         Tweet tweet = getTweet(id);
-        List<Hashtag> allTagsForTweet = tweet.getHashtags();
-        return allTagsForTweet;
+        List<Hashtag> allTags = hashtagRepository.findAll();
+        List<HashtagResponseDto> tagsOfTweet = new ArrayList<>();
+        for (Hashtag h : allTags) {
+            if (h.getTweets().contains(tweet)) {
+                tagsOfTweet.add(hashtagMapper.hashtagEntityToResponseDto(h));
+            }
+        }
+        return tagsOfTweet;
     }
 
 }
