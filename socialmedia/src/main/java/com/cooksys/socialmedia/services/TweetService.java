@@ -7,4 +7,6 @@ import java.util.Optional;
 
 public interface TweetService {
 
+    public TweetResponseDto findById(Long Id);
+
 }

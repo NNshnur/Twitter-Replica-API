@@ -3,7 +3,7 @@
 GET {{url}}/tags HTTP/1.1
 
 ###
-GET {{url}}/tweets/1 HTTP/1.1
+GET {{url}}/tweets/11
 
 ###
 

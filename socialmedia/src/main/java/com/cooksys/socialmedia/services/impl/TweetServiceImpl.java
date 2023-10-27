@@ -9,9 +9,8 @@ import com.cooksys.socialmedia.repositories.UserRepository;
 import com.cooksys.socialmedia.services.TweetService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.yaml.snakeyaml.tokens.Token;
 
-import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -26,9 +25,21 @@ public class TweetServiceImpl implements TweetService {
 
     private final UserMapper userMapper;
 
-//    public TweetResponseDto findTweetById(Token.ID tweetId) {
-//        return tweetMapper.tweetEntityToResponseDto(tweetRepository.findById(tweetId));
-//    }
-
+    public TweetResponseDto findById(Long Id) {
+        List<Tweet> allTweets = tweetRepository.findAll();
+        for (Tweet t : allTweets) {
+            if (t.getId() == Id) {
+                TweetResponseDto foundTweet = new TweetResponseDto();
+                // I did this manually because the mapper wasn't working
+                foundTweet.setAuthor(userMapper.entityToResponseDto(t.getAuthor()));
+                foundTweet.setId(Id);
+                foundTweet.setPosted(t.getPosted());
+                foundTweet.setContent(t.getContent());
+                return foundTweet;
+            }
+        }
+        TweetResponseDto nullTweet = new TweetResponseDto();
+        return nullTweet;
+    }
 
 }

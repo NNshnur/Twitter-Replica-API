@@ -18,8 +18,8 @@ public class TweetController {
 
     private final TweetService tweetService;
 
-//    @GetMapping("/{id}")
-//    public TweetResponseDto getTweetById(@PathVariable Long id) {
-//        return tweetService.findTweetById(id);
-//    }
+    @GetMapping("/{id}")
+    public TweetResponseDto getTweetById(@PathVariable Long id) {
+        return tweetService.findById(id);
+    }
 }
