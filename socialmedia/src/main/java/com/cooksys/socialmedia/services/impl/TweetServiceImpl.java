@@ -1,5 +1,6 @@
 package com.cooksys.socialmedia.services.impl;
 
+import com.cooksys.socialmedia.dto.ContextDto;
 import com.cooksys.socialmedia.dto.HashtagResponseDto;
 import com.cooksys.socialmedia.dto.TweetResponseDto;
 import com.cooksys.socialmedia.dto.UserResponseDto;
@@ -17,6 +18,7 @@ import com.cooksys.socialmedia.services.TweetService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -116,5 +118,30 @@ public class TweetServiceImpl implements TweetService {
             }
         }
         return allReplies;
+    }
+    public ContextDto getContextFromTweet(Long id) {
+        // might have misunderstood the ask here
+        Tweet tweet = getTweet(id);
+        if (tweet.isDeleted()) {
+            throw new NotFoundException("Tweet was deleted");
+        }
+        ContextDto tweetContext = new ContextDto();
+        List<TweetResponseDto> beforeList = new ArrayList<>();
+        List<TweetResponseDto> afterList = new ArrayList<>();
+        Timestamp targetTimestamp = tweet.getPosted();
+        List<Tweet> allTweets = tweetRepository.findAll();
+        for (Tweet t : allTweets) {
+            Timestamp timestamp = t.getPosted();
+            if (timestamp.compareTo(targetTimestamp) < 0 && (t.isDeleted() == false)) {
+                beforeList.add(tweetMapper.tweetEntityToResponseDto(t));
+            }
+            if (timestamp.compareTo(targetTimestamp) > 0 && (t.isDeleted() == false)) {
+                afterList.add(tweetMapper.tweetEntityToResponseDto(t));
+            }
+        }
+        tweetContext.setTarget(tweetMapper.tweetEntityToResponseDto(tweet));
+        tweetContext.setAfter(afterList);
+        tweetContext.setBefore(beforeList);
+        return tweetContext;
     }
 }
