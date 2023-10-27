@@ -1,12 +1,10 @@
 package com.cooksys.socialmedia.controllers;
 
+import com.cooksys.socialmedia.dto.*;
 import com.cooksys.socialmedia.entities.Hashtag;
 import com.cooksys.socialmedia.entities.Tweet;
 import com.cooksys.socialmedia.entities.User;
 import com.cooksys.socialmedia.services.HashtagService;
-import com.cooksys.socialmedia.dto.TweetRequestDto;
-import com.cooksys.socialmedia.dto.TweetResponseDto;
-import com.cooksys.socialmedia.dto.UserResponseDto;
 import com.cooksys.socialmedia.services.TweetService;
 import com.cooksys.socialmedia.services.UserService;
 import lombok.Generated;

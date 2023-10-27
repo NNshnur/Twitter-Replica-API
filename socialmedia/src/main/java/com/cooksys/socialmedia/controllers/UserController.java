@@ -1,9 +1,7 @@
 package com.cooksys.socialmedia.controllers;
 
 
-import com.cooksys.socialmedia.dto.CredentialsDto;
-import com.cooksys.socialmedia.dto.ProfileDto;
-import com.cooksys.socialmedia.dto.TweetResponseDto;
+import com.cooksys.socialmedia.dto.*;
 import com.cooksys.socialmedia.entities.User;
 import com.cooksys.socialmedia.services.UserService;
 import com.cooksys.socialmedia.services.ValidateService;
@@ -19,7 +17,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import com.cooksys.socialmedia.dto.CredentialsDto;
 import com.cooksys.socialmedia.dto.TweetResponseDto;
-import com.cooksys.socialmedia.dto.UserResponseDto;
 import com.cooksys.socialmedia.services.UserService;
 import org.springframework.web.bind.annotation.*;
 import com.cooksys.socialmedia.dto.UserResponseDto;
@@ -33,11 +30,8 @@ public class UserController {
 
     private final UserService userService;
 
-    private final ValidateService validateService;
-
-
     @PatchMapping("/@{username}") public User updateUsername(@RequestBody CredentialsDto credentialsDto, @RequestBody ProfileDto profileDto, @PathVariable String username) {
-        return userService.updateUserProfile(credentialsDto, profileDto);
+        return userService.updateUserProfile(credentialsDto, profileDto, username);
     }
 
     @DeleteMapping("/@{username}") public User deleteUser(@RequestBody CredentialsDto credentialsDto, @PathVariable String username) {
@@ -74,17 +68,17 @@ public class UserController {
         return userService.getAllUsers();
     }
 
-    @PostMapping("/{username}/follow")
+    @PostMapping("/@{username}/follow")
     public UserResponseDto followUser(@PathVariable String username, @RequestBody CredentialsDto credentialsDto) {
         return userService.followUser(credentialsDto, username);
     }
 
-    @PostMapping("/{username}/unfollow")
+    @PostMapping("/@{username}/unfollow")
     public UserResponseDto unFollowUser(@PathVariable String username, @RequestBody CredentialsDto credentialsDto) {
         return userService.unFollowUser(credentialsDto, username);
     }
 
-    @GetMapping("/{username}/feed")
+    @GetMapping("/@{username}/feed")
     public List<TweetResponseDto> getUserFeed(@PathVariable String username) {
         return userService.getUserFeed(username);
     }

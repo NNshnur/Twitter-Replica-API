@@ -10,14 +10,10 @@ import java.util.Optional;
 
 @Mapper(componentModel="spring", uses = {UserMapper.class})
 public interface TweetMapper {
-    @Mapping(target="content", source="content") TweetResponseDto tweetEntityToResponseDto(Tweet entity);
-    List<TweetResponseDto> tweetEntitiesToResponseDtos(List<Tweet> entities);
+        @Mapping(target="content", source="content")
+        TweetResponseDto tweetEntityToResponseDto(Tweet entity);
 
-   TweetResponseDto entityToResponseDto(Tweet tweet);
-
-	  List<TweetResponseDto> entitiesToDtos(List<Tweet> tweets);
-
-    @Mapping(target="content", source = "content")
-    List<TweetResponseDto> entitiesToResponseDtos(List<Tweet> allTweets);
+        @Mapping(target="content", source = "content")
+        List<TweetResponseDto> entitiesToResponseDtos(List<Tweet> allTweets);
 
 }

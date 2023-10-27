@@ -7,7 +7,7 @@ import com.cooksys.socialmedia.dto.TweetResponseDto;
 import com.cooksys.socialmedia.entities.Credentials;
 import com.cooksys.socialmedia.entities.Profile;
 import com.cooksys.socialmedia.entities.Tweet;
-import com.cooksys.socialmedia.entities.User
+import com.cooksys.socialmedia.entities.User;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
@@ -98,13 +98,13 @@ public class UserServiceImpl implements UserService {
 			// it says if credentials match, so i check to make sure password also matches
 			if (userRequestPassword.equals(deletedUser.getCredentials().getPassword())) {
 				deletedUser.setDeleted(false);
-				return userMapper.entityToDto(userRepository.saveAndFlush(deletedUser));
+				return userMapper.entityToResponseDto(userRepository.saveAndFlush(deletedUser));
 			} else {
 				throw new BadRequestException("Please enter the correct password to re-activate your account.");
 			}
 		}
 		
-		return userMapper.entityToDto(userRepository.saveAndFlush(userMapper.dtoToEntity(userRequestDto)));
+		return userMapper.entityToResponseDto(userRepository.saveAndFlush(userMapper.dtoToEntity(userRequestDto)));
 	}
 
 	@Override
@@ -112,21 +112,21 @@ public class UserServiceImpl implements UserService {
 		User user = activeUser(username);
 		// go through repository
 		List<User> followers = user.getFollowers();
-		return userMapper.entitiesToDtos(followers);
+		return userMapper.entitiesToResponseDtos(followers);
 	}
 
 	@Override
 	public List<UserResponseDto> getUserFollowing(String username) {
 		User user = activeUser(username);
 		List<User> following = user.getFollowing();
-		return userMapper.entitiesToDtos(following);
+		return userMapper.entitiesToResponseDtos(following);
 	}
 
 	@Override
 	public List<TweetResponseDto> getUserMentions(String username) {
 		User user = activeUser(username);
 		List<Tweet> tweets = user.getMentionedTweets();
-		return tweetMapper.entitiesToDtos(tweets);
+		return tweetMapper.entitiesToResponseDtos(tweets);
 	}
 
 
@@ -134,11 +134,11 @@ public class UserServiceImpl implements UserService {
     private User validateCredentials(CredentialsDto credentialsDto) {
         User user = userRepository.findByCredentialsUsernameAndDeletedFalse(credentialsDto.getUsername());
         if (user != null && user.getCredentials().getPassword().equals(credentialsDto.getPassword())) {
-        return user;
-    } else {
+            return user;
+        } else {
             throw new BadRequestException("The password provided is incorrect");
         }
-
+    }
 
 
     public boolean usernameExists(String username) {
@@ -156,7 +156,7 @@ public class UserServiceImpl implements UserService {
         for (User u : allUsers) {
             if (u.getCredentials().getUsername().equals(username)) {
                 List<Tweet> usersTweets = u.getTweets();
-                return tweetMapper.tweetEntitiesToResponseDtos(usersTweets);
+                return tweetMapper.entitiesToResponseDtos(usersTweets);
             }
         }
        List<TweetResponseDto> tweets = new ArrayList<>();
@@ -182,15 +182,10 @@ public class UserServiceImpl implements UserService {
     // need to store deleted users in a different way, maybe create a new table
     // can set a boolean for deleted
 
-    public User updateUserProfile(CredentialsDto credentialsDto, ProfileDto profileDto) {
-        String username = credentialsDto.getUsername();
-        if (usernameExists(username)) {
-            List<User> allUsers = userRepository.findAll();
-            User userToUpdate = new User();
-            for (User u : allUsers) {
-                if (u.getCredentials().getUsername().equals(username)) {
-                    userToUpdate = u;
-                }
+    public User updateUserProfile(CredentialsDto credentialsDto, ProfileDto profileDto, String username) {
+            User userToUpdate =  validateCredentials(credentialsDto);
+            if (userToUpdate.isDeleted() || userToUpdate == null) {
+                throw new NotFoundException("The user is either deleted or does not exist in DB");
             }
             Profile profileUpdate = new Profile();
             profileUpdate.setEmail(profileDto.getEmail());
@@ -205,13 +200,7 @@ public class UserServiceImpl implements UserService {
             userRepository.saveAndFlush(userToUpdate);
             return userToUpdate;
         }
-        else {
-            return new User();
-            // this should return an error exception
-        }
-    }
 
-}
     @Override
     public List<UserResponseDto> getAllUsers() {
         return userMapper.entitiesToResponseDtos(userRepository.findByDeletedFalse());

@@ -9,16 +9,9 @@ import com.cooksys.socialmedia.mappers.HashtagMapper;
 import com.cooksys.socialmedia.mappers.TweetMapper;
 import com.cooksys.socialmedia.mappers.UserMapper;
 import com.cooksys.socialmedia.repositories.HashtagRepository;
-
 import com.cooksys.socialmedia.dto.TweetRequestDto;
 import com.cooksys.socialmedia.dto.UserResponseDto;
-import com.cooksys.socialmedia.entities.Tweet;
-import com.cooksys.socialmedia.entities.User;
-import com.cooksys.socialmedia.exceptions.NotFoundException;
 import org.springframework.stereotype.Service;
-import com.cooksys.socialmedia.mappers.TweetMapper;
-import com.cooksys.socialmedia.mappers.UserMapper;
-
 import com.cooksys.socialmedia.repositories.TweetRepository;
 import com.cooksys.socialmedia.repositories.UserRepository;
 import com.cooksys.socialmedia.services.TweetService;
@@ -162,6 +155,7 @@ public class TweetServiceImpl implements TweetService {
         reposts.add(repost);
         tweetRepository.saveAndFlush(tweetToRepost);
         return tweetMapper.tweetEntityToResponseDto(repost);
+    }
 
     private List<User> parseMentionsFromTweet(Tweet tweet) {
         List<User> mentionedUsers = new ArrayList<>();
@@ -192,7 +186,7 @@ public class TweetServiceImpl implements TweetService {
 
         List<Tweet> validReposts = reposts.stream().filter(tweet -> !tweet.isDeleted()).collect(Collectors.toList());
 
-        List<TweetResponseDto> repostDtos = validReposts.stream().map(tweetMapper::entityToResponseDto).collect(Collectors.toList());
+        List<TweetResponseDto> repostDtos = validReposts.stream().map(tweetMapper::tweetEntityToResponseDto).collect(Collectors.toList());
 
         return repostDtos;
     }
@@ -211,7 +205,7 @@ public class TweetServiceImpl implements TweetService {
                 .collect(Collectors.toList());
 
         List<UserResponseDto> userDtos = validMentionedUsers.stream()
-                .map(userMapper::entityToDto)
+                .map(userMapper::entityToResponseDto)
                 .collect(Collectors.toList());
 
         return userDtos;
@@ -234,7 +228,7 @@ public class TweetServiceImpl implements TweetService {
 
         tweetRepository.saveAndFlush(replyTweet);
 
-        TweetResponseDto replyDto = tweetMapper.entityToResponseDto(replyTweet);
+        TweetResponseDto replyDto = tweetMapper.tweetEntityToResponseDto(replyTweet);
         return replyDto;
 
     }
