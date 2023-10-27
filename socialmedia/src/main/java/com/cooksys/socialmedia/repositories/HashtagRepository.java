@@ -10,4 +10,5 @@ import com.cooksys.socialmedia.entities.Hashtag;
 @Repository
 public interface HashtagRepository extends JpaRepository<Hashtag, Long> {
 	Optional<Hashtag> findByLabel(String label);
+
 }
