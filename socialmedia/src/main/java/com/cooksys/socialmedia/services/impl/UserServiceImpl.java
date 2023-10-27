@@ -1,11 +1,13 @@
 package com.cooksys.socialmedia.services.impl;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
 import com.cooksys.socialmedia.dto.UserRequestDto;
 import com.cooksys.socialmedia.dto.UserResponseDto;
+import com.cooksys.socialmedia.entities.Tweet;
 import com.cooksys.socialmedia.entities.User;
 import com.cooksys.socialmedia.exceptions.BadRequestException;
 import com.cooksys.socialmedia.exceptions.NotFoundException;
@@ -34,36 +36,47 @@ public class UserServiceImpl implements UserService {
 		}
 	}
 	
-	
-	private String checkUsernameStatus(UserRequestDto userRequestDto) {
-		Optional<User> optionalUser = userRepository.findByCredentials_Username(userRequestDto.getCredentials().getUsername());
+	// returns an error if username is taken
+	// otherwise returns "available" or "deleted"
+	private String checkUsernameStatus(String username) {
+		Optional<User> optionalUser = userRepository.findByCredentials_Username(username);
 		if (optionalUser.isPresent() && optionalUser.get().isDeleted() == false) {
 			throw new BadRequestException("Username is taken! Please choose another username.");
 		}
 		
-		System.out.println(optionalUser.isPresent());
 		if (optionalUser.isPresent() && optionalUser.get().isDeleted()) {
 			return "deleted";
-		} else {
-			return "availabe";
 		}
+		// if it passes the 2 checks above, it's an available username
+		return "availabe";
 	}
 	
+	// returns user even if it has been deleted
 	private User getUser(String username) {
+		// able to grab users even if they have been deleted
 		Optional<User> optionalUser = userRepository.findByCredentials_Username(username);
 		if (optionalUser.isEmpty()) {
 			throw new NotFoundException("User not found.");
 		}
 		return optionalUser.get();
-	} 
-
+	}
+	
+	private User activeUser(String username) {
+		User user = getUser(username);
+		if (user.isDeleted()) {
+			throw new NotFoundException("User not found!");
+		}
+		return user;
+	}
+		
 	@Override
 	public UserResponseDto createUser(UserRequestDto userRequestDto) {
 		// userName, password, email, firstName, lastName, phone
 
 		// validate given information and make sure username is unique
 		validateUserRequest(userRequestDto);
-		String usernameStatus = checkUsernameStatus(userRequestDto);
+		String username = userRequestDto.getCredentials().getUsername();
+		String usernameStatus = checkUsernameStatus(username);
 		String userRequestPassword = userRequestDto.getCredentials().getPassword();
 		
 		if (usernameStatus.equals("deleted")) {
@@ -73,7 +86,6 @@ public class UserServiceImpl implements UserService {
 				deletedUser.setDeleted(false);
 				return userMapper.entityToDto(userRepository.saveAndFlush(deletedUser));
 			} else {
-				System.out.println(deletedUser.getCredentials().getPassword());
 				throw new BadRequestException("Please enter the correct password to re-activate your account.");
 			}
 		}
@@ -81,7 +93,21 @@ public class UserServiceImpl implements UserService {
 		return userMapper.entityToDto(userRepository.saveAndFlush(userMapper.dtoToEntity(userRequestDto)));
 	}
 
-//	@Override
-//	public List<User> getUserFollowers(String username) {
-//	}
+	@Override
+	public List<User> getUserFollowers(String username) {
+		User user = activeUser(username);
+		return user.getFollowers();
+	}
+
+	@Override
+	public List<User> getUserFollowing(String username) {
+		User user = activeUser(username);
+		return user.getFollowing();
+	}
+
+	@Override
+	public List<Tweet> getUserMentions(String username) {
+		User user = activeUser(username);
+		return user.getMentionedTweets();
+	}
 }

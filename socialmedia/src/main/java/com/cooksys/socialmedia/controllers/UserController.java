@@ -1,6 +1,10 @@
 package com.cooksys.socialmedia.controllers;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -9,6 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.cooksys.socialmedia.dto.UserRequestDto;
 import com.cooksys.socialmedia.dto.UserResponseDto;
+import com.cooksys.socialmedia.entities.Tweet;
+import com.cooksys.socialmedia.entities.User;
 import com.cooksys.socialmedia.services.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -26,8 +32,18 @@ public class UserController {
 		return userService.createUser(userRequestDto);
 	}
 	
-//	@GetMapping("/@{username}/followers")
-//	public List<User> getUserFollowers(@PathVariable String username) {
-//		return userService.getUserFollowers(username);
-//	}
+	@GetMapping("/@{username}/followers")
+	public List<User> getUserFollowers(@PathVariable String username) {
+		return userService.getUserFollowers(username);
+	}
+	
+	@GetMapping("/@{username}/following")
+	public List<User> getUserFollowing(@PathVariable String username) {
+		return userService.getUserFollowing(username);
+	}
+	
+	@GetMapping("/@{username}/mentions")
+	public List<Tweet> getUserMentions(@PathVariable String username) {
+		return userService.getUserMentions(username);
+	}
 }
