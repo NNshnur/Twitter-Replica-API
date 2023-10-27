@@ -146,16 +146,14 @@ public class TweetServiceImpl implements TweetService {
         Tweet tweetToRepost = getTweet(id);
         Tweet repost = new Tweet();
         repost.setRepostOf(tweetToRepost);
-        String username = credentialsDto.getUsername();
-        List<User> allUsers = userRepository.findAll();
-        for (User u : allUsers) {
-            if (u.getCredentials().getUsername().equals(username)) {
-                repost.setAuthor(u);
-            }
-        }
+        User author = userRepository.findByCredentialsUsernameAndDeletedFalse(credentialsDto.getUsername());
+        repost.setAuthor(author);
         repost.setHashtags(tweetToRepost.getHashtags());
+        List<Tweet> reposts = tweetToRepost.getReposts();
         // may need to set more fields
         tweetRepository.saveAndFlush(repost);
+        reposts.add(repost);
+        tweetRepository.saveAndFlush(tweetToRepost);
         return tweetMapper.tweetEntityToResponseDto(repost);
     }
 }

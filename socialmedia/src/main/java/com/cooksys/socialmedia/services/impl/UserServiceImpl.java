@@ -55,17 +55,19 @@ public class UserServiceImpl implements UserService {
 
     public User deleteUser(CredentialsDto credentialsDto) {
         String username = credentialsDto.getUsername();
-        if (usernameExists(username)) {
-            List<User> allUsers = userRepository.findAll();
+        User userToDelete = userRepository.findByCredentialsUsernameAndDeletedFalse(username);
+        if (userToDelete == null) {
+            throw new NotFoundException("user doesn't exist");
+        }
+        List<User> allUsers = userRepository.findAll();
             for (User u : allUsers) {
                 if (u.getCredentials().getUsername().equals(username)) {
                     u.setDeleted(true);
                     return u;
                 }
             }
-        }
-        return new User();
-        // replace with exception
+        return userToDelete;
+
     }
     // need to store deleted users in a different way, maybe create a new table
     // can set a boolean for deleted
