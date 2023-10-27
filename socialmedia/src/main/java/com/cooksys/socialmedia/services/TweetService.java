@@ -19,4 +19,6 @@ public interface TweetService {
 
     public List<HashtagResponseDto> getAllTagsFromTweet(Long id);
 
+    public List<TweetResponseDto> getAllRepliesFromTweet(Long id);
+
 }

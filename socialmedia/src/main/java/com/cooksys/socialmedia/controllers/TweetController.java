@@ -48,4 +48,8 @@ public class TweetController {
         return tweetService.getAllTagsFromTweet(id);
     }
 
+    @GetMapping("/{id}/replies")
+    public List<TweetResponseDto> findAllRepliesForTweet(@PathVariable Long id) {
+        return tweetService.getAllRepliesFromTweet(id);
+    }
 }

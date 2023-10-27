@@ -90,6 +90,9 @@ public class TweetServiceImpl implements TweetService {
 
     public List<HashtagResponseDto> getAllTagsFromTweet(Long id) {
         Tweet tweet = getTweet(id);
+        if (tweet.isDeleted()) {
+            throw new NotFoundException("Tweet was deleted");
+        }
         List<Hashtag> allTags = hashtagRepository.findAll();
         List<HashtagResponseDto> tagsOfTweet = new ArrayList<>();
         for (Hashtag h : allTags) {
@@ -100,4 +103,18 @@ public class TweetServiceImpl implements TweetService {
         return tagsOfTweet;
     }
 
+    public List<TweetResponseDto> getAllRepliesFromTweet(Long id) {
+        Tweet tweet = getTweet(id);
+        if (tweet.isDeleted()) {
+            throw new NotFoundException("Tweet was deleted");
+        }
+        List<Tweet> allTweets = tweetRepository.findAll();
+        List<TweetResponseDto> allReplies = new ArrayList<>();
+        for (Tweet t : allTweets) {
+            if (t.getReplies().contains(tweet) && (t.isDeleted() == false)) {
+                allReplies.add(tweetMapper.tweetEntityToResponseDto(t));
+            }
+        }
+        return allReplies;
+    }
 }

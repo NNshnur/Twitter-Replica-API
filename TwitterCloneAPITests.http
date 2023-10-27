@@ -11,6 +11,10 @@ GET {{url}}/tweets/entity/17
 GET {{url}}/tweets/15/likes
 ###
 
+GET {{url}}/tweets/15/replies
+
+###
+
 GET {{url}}/tweets/11/tags
 
 ###
