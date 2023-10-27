@@ -3,10 +3,17 @@
 GET {{url}}/tags HTTP/1.1
 
 ###
-GET {{url}}/tweets/11
+GET {{url}}/tweets/12
 
 ###
+GET {{url}}/tweets/entity/17
+###
+GET {{url}}/tweets/15/likes
+###
 
+GET {{url}}/tweets/14/tags
+
+###
 GET {{url}}/validate/tag/exists/mario
 
 ###
@@ -24,7 +31,7 @@ Content-Type: application/json
 }
 
 ###
-GET {{url}}/users/@therealmc/tweets HTTP/1.1
+GET {{url}}/users/@Luigi/tweets HTTP/1.1
 
 ###
 PATCH {{url}}/users/@therealmc HTTP/1.1
