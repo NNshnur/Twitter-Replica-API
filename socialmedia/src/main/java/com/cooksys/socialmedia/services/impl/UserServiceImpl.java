@@ -32,6 +32,23 @@ public class UserServiceImpl implements UserService {
         return false;
     }
 
+    public User deleteUser(CredentialsDto credentialsDto) {
+        String username = credentialsDto.getUsername();
+        if (usernameExists(username)) {
+            List<User> allUsers = userRepository.findAll();
+            for (User u : allUsers) {
+                if (u.getCredentials().getUsername().equals(username)) {
+                    u.setDeleted(true);
+                    return u;
+                }
+            }
+        }
+        return new User();
+        // replace with exception
+    }
+    // need to store deleted users in a different way, maybe create a new table
+    // can set a boolean for deleted
+
     public User updateUserProfile(CredentialsDto credentialsDto, ProfileDto profileDto) {
         String username = credentialsDto.getUsername();
         if (usernameExists(username)) {
@@ -57,6 +74,7 @@ public class UserServiceImpl implements UserService {
         }
         else {
             return new User();
+            // this should return an error exception
         }
     }
 

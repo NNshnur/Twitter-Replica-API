@@ -6,4 +6,6 @@ import com.cooksys.socialmedia.entities.User;
 
 public interface UserService {
     public User updateUserProfile(CredentialsDto credentialsDto, ProfileDto profileDto);
+
+    public User deleteUser(CredentialsDto credentialsDto);
 }

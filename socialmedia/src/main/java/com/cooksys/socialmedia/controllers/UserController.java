@@ -5,10 +5,7 @@ import com.cooksys.socialmedia.dto.ProfileDto;
 import com.cooksys.socialmedia.entities.User;
 import com.cooksys.socialmedia.services.UserService;
 import com.cooksys.socialmedia.services.ValidateService;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,6 +21,10 @@ public class UserController {
 
     @PatchMapping("/@{username}") public User updateUsername(@RequestBody CredentialsDto credentialsDto, @RequestBody ProfileDto profileDto) {
         return userService.updateUserProfile(credentialsDto, profileDto);
+    }
+
+    @DeleteMapping("/@{username}") public User deleteUser(@RequestBody CredentialsDto credentialsDto) {
+        return userService.deleteUser(credentialsDto);
     }
 
     // patch users @ username
