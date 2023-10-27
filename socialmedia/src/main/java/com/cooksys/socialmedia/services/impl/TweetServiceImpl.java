@@ -26,9 +26,9 @@ public class TweetServiceImpl implements TweetService {
 
     private final UserMapper userMapper;
 
-    public TweetResponseDto findTweetById(Token.ID tweetId) {
-        return tweetMapper.tweetEntityToResponseDto(tweetRepository.findById(tweetId));
-    }
+//    public TweetResponseDto findTweetById(Token.ID tweetId) {
+//        return tweetMapper.tweetEntityToResponseDto(tweetRepository.findById(tweetId));
+//    }
 
 
 }
