@@ -4,6 +4,8 @@ import com.cooksys.socialmedia.dto.*;
 import com.cooksys.socialmedia.entities.Hashtag;
 import com.cooksys.socialmedia.entities.Tweet;
 import com.cooksys.socialmedia.entities.User;
+import com.cooksys.socialmedia.exceptions.BadRequestException;
+import com.cooksys.socialmedia.exceptions.NotAuthorizedException;
 import com.cooksys.socialmedia.exceptions.NotFoundException;
 import com.cooksys.socialmedia.mappers.HashtagMapper;
 import com.cooksys.socialmedia.mappers.TweetMapper;
@@ -42,7 +44,48 @@ public class TweetServiceImpl implements TweetService {
 
     private final HashtagMapper hashtagMapper;
 
+    private Tweet tweetExists(Long id) {
+        Optional<Tweet> optionalTweet = tweetRepository.findById(id);
+        if (optionalTweet.isEmpty()) {
+            throw new NotFoundException("Couldn't find tweet with that ID.");
+        }
+        return optionalTweet.get();
+    }
 
+    private void validateTweetRequest(TweetRequestDto tweetRequestDto) {
+        if (tweetRequestDto.getContent() == null || tweetRequestDto.getCredentials() == null) {
+            throw new BadRequestException("Tweet must have content and an author");
+        }
+
+        if (tweetRequestDto.getCredentials().getUsername() == null) {
+            throw new BadRequestException("Tweet must have an author (username).");
+        }
+    }
+
+    private boolean activeUser(String username) {
+        List<User> activeUsers = userRepository.findAllByDeletedFalse();
+        for (User activeUser : activeUsers) {
+            if (username.equals(activeUser.getCredentials().getUsername())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private User getUser(String username) {
+        Optional<User> optionalUser = userRepository.findByCredentials_Username(username);
+        if (optionalUser.isEmpty()) {
+            throw new NotFoundException("User not found.");
+        }
+        return optionalUser.get();
+    }
+
+    private Hashtag getHashtag(String label) {
+        System.out.println(label);
+        Optional<Hashtag> optionalHashtag = hashtagRepository.findByLabel(label);
+
+        return optionalHashtag.get();
+    }
     private Tweet getTweet(Long id) {
         Optional<Tweet> tweet = tweetRepository.findById(id);
         if (tweet.isEmpty()) {
@@ -117,9 +160,8 @@ public class TweetServiceImpl implements TweetService {
         return allReplies;
     }
     public ContextDto getContextFromTweet(Long id) {
-        // might have misunderstood the ask here
         Tweet tweet = getTweet(id);
-        if (tweet.isDeleted()) {
+        if (tweet.isDeleted() || tweet == null) {
             throw new NotFoundException("Tweet was deleted");
         }
         ContextDto tweetContext = new ContextDto();
@@ -232,5 +274,86 @@ public class TweetServiceImpl implements TweetService {
         return replyDto;
 
     }
+
+    @Override
+    public List<TweetResponseDto> getAllTweets() {
+        System.out.println("hello");
+        return tweetMapper.entitiesToResponseDtos(tweetRepository.findAll());
+    }
+
+    @Override
+    public TweetResponseDto createTweet(TweetRequestDto tweetRequestDto) {
+        // validate request
+        validateTweetRequest(tweetRequestDto);
+
+        // if credentials don't match an active user, send an error
+        String authorUsername = tweetRequestDto.getCredentials().getUsername();
+        if (activeUser(authorUsername) == false) {
+            throw new NotFoundException("Author not found.");
+        }
+
+        Tweet tweet = tweetMapper.dtoToEntity(tweetRequestDto);
+
+        // get content, parse through it for mentions and hashtags
+        String[] splitContent = tweetRequestDto.getContent().split(" ");
+        List<User> mentionedUsers = new ArrayList<>();
+        List<Hashtag> hashtags = new ArrayList<>();
+        for (String word : splitContent) {
+
+            if (word.startsWith("@")) {
+                String username = word.substring(1);
+                mentionedUsers.add(getUser(username));
+            }
+
+            if (word.startsWith("#")) {
+                Hashtag hashtag = getHashtag(word);
+                hashtags.add(hashtag);
+
+            }
+        }
+        tweet.setMentionedUsers(mentionedUsers);
+        tweet.setHashtags(hashtags);
+
+        // need to update lastused timestamp for hashtag
+        return tweetMapper.tweetEntityToResponseDto(tweetRepository.saveAndFlush(tweet));
+    }
+
+    @Override
+    public TweetResponseDto deleteTweet(Long id, CredentialsDto credentialsDto) {
+        Tweet tweet = tweetExists(id);
+        String tweetAuthor = tweet.getAuthor().getCredentials().getUsername();
+        String requestAuthor = credentialsDto.getUsername();
+        if (!tweetAuthor.equals(requestAuthor)) {
+            throw new NotAuthorizedException("You must be the owner of this tweet to delete it.");
+        }
+        tweet.setDeleted(true);
+        return tweetMapper.tweetEntityToResponseDto(tweetRepository.saveAndFlush(tweet));
+    }
+
+    @Override
+    public void likeTweet(Long id, CredentialsDto credentialsDto) {
+        // get tweet, make sure it's not deleted
+        Tweet tweet = tweetExists(id);
+        if (tweet.isDeleted()) {
+            throw new NotFoundException("Tweet not found");
+        }
+
+        // make sure credentials belong to an active user
+        if (!activeUser(credentialsDto.getUsername())) {
+            throw new NotAuthorizedException("Must be an active user to like this tweet");
+        }
+
+        User user = getUser(credentialsDto.getUsername());
+        user.getLikedTweets().add(tweet);
+        userRepository.saveAndFlush(user);
+    }
+
+
+
+
+
+
+
+
 }
 

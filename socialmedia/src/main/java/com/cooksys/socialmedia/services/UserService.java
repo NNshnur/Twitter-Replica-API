@@ -11,9 +11,9 @@ import com.cooksys.socialmedia.dto.UserResponseDto;
 import java.util.List;
 
 public interface UserService {
-    public User updateUserProfile(UserRequestDto userRequestDto, String name);
+    public UserResponseDto updateUserProfile(UserRequestDto userRequestDto, String name);
 
-    public User deleteUser(CredentialsDto credentialsDto);
+    public UserResponseDto deleteUser(CredentialsDto credentialsDto);
 
     public List<TweetResponseDto> getAllTweetsByUser(String username);
 	

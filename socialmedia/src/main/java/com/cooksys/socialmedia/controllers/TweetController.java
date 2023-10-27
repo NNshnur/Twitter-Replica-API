@@ -4,6 +4,7 @@ import com.cooksys.socialmedia.dto.*;
 import com.cooksys.socialmedia.entities.Hashtag;
 import com.cooksys.socialmedia.entities.Tweet;
 import com.cooksys.socialmedia.entities.User;
+import com.cooksys.socialmedia.exceptions.BadRequestException;
 import com.cooksys.socialmedia.services.HashtagService;
 import com.cooksys.socialmedia.services.TweetService;
 import com.cooksys.socialmedia.services.UserService;
@@ -12,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 
 @RestController
@@ -31,11 +31,6 @@ public class TweetController {
         return tweetService.findById(id);
     }
 
-//    @GetMapping("/entity/{id}")
-//    public Optional<Tweet> findTweetById(@PathVariable Long id) {
-//        return tweetService.findTweetById(id);
-//    }
-
     @GetMapping("/{id}/likes")
     public List<UserResponseDto> findAllUsersWhoLikedTweet(@PathVariable Long id) {
         return tweetService.getAllUserLikesOfTweet(id);
@@ -53,7 +48,7 @@ public class TweetController {
 
     @GetMapping("/{id}/context")
     public ContextDto getContextForTweet(@PathVariable Long id) {
-        return tweetService.getContextFromTweet(id);
+           return tweetService.getContextFromTweet(id);
     }
 
     @PostMapping("/{id}/repost")
@@ -74,6 +69,25 @@ public class TweetController {
     @PostMapping("/{id}/reply")
     public TweetResponseDto createTweetReply(@PathVariable Long id, @RequestBody TweetRequestDto tweetRequestDto) {
         return tweetService.createTweetReply(id, tweetRequestDto);
+    }
+    @GetMapping
+    public List<TweetResponseDto> getAllTweets() {
+        return tweetService.getAllTweets();
+    };
+
+    @PostMapping
+    public TweetResponseDto createTweet(@RequestBody TweetRequestDto tweetRequestDto) {
+        return tweetService.createTweet(tweetRequestDto);
+    }
+
+    @DeleteMapping("/{id}")
+    public TweetResponseDto deleteTweet(@PathVariable Long id, @RequestBody CredentialsDto credentialsDto) {
+        return tweetService.deleteTweet(id, credentialsDto);
+    }
+
+    @PostMapping("/{id}/like")
+    public void likeTweet(@PathVariable Long id, @RequestBody CredentialsDto credentialsDto) {
+        tweetService.likeTweet(id, credentialsDto);
     }
 
 }

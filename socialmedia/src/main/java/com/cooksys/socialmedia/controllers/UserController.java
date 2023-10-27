@@ -31,12 +31,12 @@ public class UserController {
     private final UserService userService;
 
 
-    @PatchMapping("/@{username}") public User updateUsername(@RequestBody UserRequestDto userRequestDto, @PathVariable String username) {
+    @PatchMapping("/@{username}") public UserResponseDto updateUsername(@RequestBody UserRequestDto userRequestDto, @PathVariable String username) {
         return userService.updateUserProfile(userRequestDto, username);
     }
 
 
-    @DeleteMapping("/@{username}") public User deleteUser(@RequestBody CredentialsDto credentialsDto, @PathVariable String username) {
+    @DeleteMapping("/@{username}") public UserResponseDto deleteUser(@RequestBody CredentialsDto credentialsDto, @PathVariable String username) {
         return userService.deleteUser(credentialsDto);
     }
 

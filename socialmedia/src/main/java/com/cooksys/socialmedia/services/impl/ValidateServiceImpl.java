@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.cooksys.socialmedia.entities.User;
+import com.cooksys.socialmedia.exceptions.NotFoundException;
 import com.cooksys.socialmedia.repositories.UserRepository;
 import com.cooksys.socialmedia.services.ValidateService;
 import lombok.RequiredArgsConstructor;
@@ -29,9 +30,10 @@ public class ValidateServiceImpl implements ValidateService {
 
 	@Override
 	public boolean tagExists(String label) {
-		Optional<Hashtag> optionalHashtag = hashtagRepository.findByLabel("#" + label);
+		Optional<Hashtag> optionalHashtag = hashtagRepository.findByLabel(label);
 		return optionalHashtag.isPresent();
 	}
+
 
 	public boolean usernameExists(String username) {
 		List<User> allUsers = userRepository.findAll();

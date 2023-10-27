@@ -132,6 +132,9 @@ public class UserServiceImpl implements UserService {
 
 
     private User validateCredentials(CredentialsDto credentialsDto) {
+        if (credentialsDto.equals(null)) {
+            throw new NotAuthorizedException("Not authorized user");
+        }
         User user = userRepository.findByCredentialsUsernameAndDeletedFalse(credentialsDto.getUsername());
         if (user != null && user.getCredentials().getPassword().equals(credentialsDto.getPassword())) {
             return user;
@@ -163,39 +166,47 @@ public class UserServiceImpl implements UserService {
         return tweets;
     }
 
-    public User deleteUser(CredentialsDto credentialsDto) {
+    public UserResponseDto deleteUser(CredentialsDto credentialsDto) {
         User userToDelete = validateCredentials(credentialsDto);
         if (userToDelete.isDeleted() || userToDelete == null) {
             throw new NotFoundException("user doesn't exist");
         }
         userToDelete.setDeleted(true);
 
-        return userToDelete;
+        return userMapper.entityToResponseDto(userToDelete);
 
     }
 
-    public User updateUserProfile(UserRequestDto userRequestDto, String username) {
+    public UserResponseDto updateUserProfile(UserRequestDto userRequestDto, String username) {
             User userToUpdate =  validateCredentials(userRequestDto.getCredentials());
-            if (userToUpdate.isDeleted() || userToUpdate == null) {
+            if (userToUpdate.isDeleted() || userToUpdate == null || userToUpdate.getProfile() == null ) {
                 throw new NotFoundException("The user is either deleted or does not exist in DB");
             }
+            userToUpdate = userRepository.findByCredentialsUsernameAndDeletedFalse(username);
+
             Profile profileUpdate = new Profile();
             profileUpdate.setEmail(userRequestDto.getProfile().getEmail());
             profileUpdate.setFirstName(userRequestDto.getProfile().getFirstName());
             profileUpdate.setLastName(userRequestDto.getProfile().getLastName());
             profileUpdate.setPhone(userRequestDto.getProfile().getPhone());
+
             userToUpdate.setProfile(profileUpdate);
             Credentials credentialsUpdate = new Credentials();
             credentialsUpdate.setUsername(username);
             credentialsUpdate.setPassword(userRequestDto.getCredentials().getPassword());
             userToUpdate.setCredentials(credentialsUpdate);
             userRepository.saveAndFlush(userToUpdate);
-            return userToUpdate;
+
+            return userMapper.entityToResponseDto(userToUpdate);
         }
 
     @Override
     public List<UserResponseDto> getAllUsers() {
-        return userMapper.entitiesToResponseDtos(userRepository.findByDeletedFalse());
+      List<User> allUsers = userRepository.findByDeletedFalse();
+        if (allUsers.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return userMapper.entitiesToResponseDtos(allUsers);
     }
 
     @Override
