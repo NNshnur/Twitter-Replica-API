@@ -164,18 +164,12 @@ public class UserServiceImpl implements UserService {
     }
 
     public User deleteUser(CredentialsDto credentialsDto) {
-        String username = credentialsDto.getUsername();
-        User userToDelete = userRepository.findByCredentialsUsernameAndDeletedFalse(username);
-        if (userToDelete == null) {
+        User userToDelete = validateCredentials(credentialsDto);
+        if (userToDelete.isDeleted() || userToDelete == null) {
             throw new NotFoundException("user doesn't exist");
         }
-        List<User> allUsers = userRepository.findAll();
-            for (User u : allUsers) {
-                if (u.getCredentials().getUsername().equals(username)) {
-                    u.setDeleted(true);
-                    return u;
-                }
-            }
+        userToDelete.setDeleted(true);
+
         return userToDelete;
 
     }
