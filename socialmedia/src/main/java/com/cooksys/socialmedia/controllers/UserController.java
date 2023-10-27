@@ -1,7 +1,15 @@
 package com.cooksys.socialmedia.controllers;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.cooksys.socialmedia.dto.UserRequestDto;
+import com.cooksys.socialmedia.dto.UserResponseDto;
+import com.cooksys.socialmedia.services.UserService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -9,4 +17,17 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RequestMapping ("/users")
 public class UserController {
+	
+	private final UserService userService;
+	
+	@PostMapping
+	@ResponseStatus(HttpStatus.CREATED)
+	public UserResponseDto createUser(@RequestBody UserRequestDto userRequestDto) {
+		return userService.createUser(userRequestDto);
+	}
+	
+//	@GetMapping("/@{username}/followers")
+//	public List<User> getUserFollowers(@PathVariable String username) {
+//		return userService.getUserFollowers(username);
+//	}
 }
