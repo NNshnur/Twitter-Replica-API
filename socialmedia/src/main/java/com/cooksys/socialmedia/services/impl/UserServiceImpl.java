@@ -173,23 +173,21 @@ public class UserServiceImpl implements UserService {
         return userToDelete;
 
     }
-    // need to store deleted users in a different way, maybe create a new table
-    // can set a boolean for deleted
 
-    public User updateUserProfile(CredentialsDto credentialsDto, ProfileDto profileDto, String username) {
-            User userToUpdate =  validateCredentials(credentialsDto);
+    public User updateUserProfile(UserRequestDto userRequestDto, String username) {
+            User userToUpdate =  validateCredentials(userRequestDto.getCredentials());
             if (userToUpdate.isDeleted() || userToUpdate == null) {
                 throw new NotFoundException("The user is either deleted or does not exist in DB");
             }
             Profile profileUpdate = new Profile();
-            profileUpdate.setEmail(profileDto.getEmail());
-            profileUpdate.setFirstName(profileDto.getFirstName());
-            profileUpdate.setLastName(profileDto.getLastName());
-            profileUpdate.setPhone(profileDto.getPhone());
+            profileUpdate.setEmail(userRequestDto.getProfile().getEmail());
+            profileUpdate.setFirstName(userRequestDto.getProfile().getFirstName());
+            profileUpdate.setLastName(userRequestDto.getProfile().getLastName());
+            profileUpdate.setPhone(userRequestDto.getProfile().getPhone());
             userToUpdate.setProfile(profileUpdate);
             Credentials credentialsUpdate = new Credentials();
             credentialsUpdate.setUsername(username);
-            credentialsUpdate.setPassword(credentialsDto.getPassword());
+            credentialsUpdate.setPassword(userRequestDto.getCredentials().getPassword());
             userToUpdate.setCredentials(credentialsUpdate);
             userRepository.saveAndFlush(userToUpdate);
             return userToUpdate;
