@@ -1,9 +1,6 @@
 package com.cooksys.socialmedia.services.impl;
 
-import com.cooksys.socialmedia.dto.ContextDto;
-import com.cooksys.socialmedia.dto.HashtagResponseDto;
-import com.cooksys.socialmedia.dto.TweetResponseDto;
-import com.cooksys.socialmedia.dto.UserResponseDto;
+import com.cooksys.socialmedia.dto.*;
 import com.cooksys.socialmedia.entities.Hashtag;
 import com.cooksys.socialmedia.entities.Tweet;
 import com.cooksys.socialmedia.entities.User;
@@ -143,5 +140,22 @@ public class TweetServiceImpl implements TweetService {
         tweetContext.setAfter(afterList);
         tweetContext.setBefore(beforeList);
         return tweetContext;
+    }
+
+    public TweetResponseDto createRepost(Long id, CredentialsDto credentialsDto) {
+        Tweet tweetToRepost = getTweet(id);
+        Tweet repost = new Tweet();
+        repost.setRepostOf(tweetToRepost);
+        String username = credentialsDto.getUsername();
+        List<User> allUsers = userRepository.findAll();
+        for (User u : allUsers) {
+            if (u.getCredentials().getUsername().equals(username)) {
+                repost.setAuthor(u);
+            }
+        }
+        repost.setHashtags(tweetToRepost.getHashtags());
+        // may need to set more fields
+        tweetRepository.saveAndFlush(repost);
+        return tweetMapper.tweetEntityToResponseDto(repost);
     }
 }

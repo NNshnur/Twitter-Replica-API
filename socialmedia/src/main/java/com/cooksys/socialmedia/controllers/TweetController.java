@@ -1,9 +1,6 @@
 package com.cooksys.socialmedia.controllers;
 
-import com.cooksys.socialmedia.dto.ContextDto;
-import com.cooksys.socialmedia.dto.HashtagResponseDto;
-import com.cooksys.socialmedia.dto.TweetResponseDto;
-import com.cooksys.socialmedia.dto.UserResponseDto;
+import com.cooksys.socialmedia.dto.*;
 import com.cooksys.socialmedia.entities.Hashtag;
 import com.cooksys.socialmedia.entities.Tweet;
 import com.cooksys.socialmedia.entities.User;
@@ -12,10 +9,7 @@ import com.cooksys.socialmedia.services.TweetService;
 import com.cooksys.socialmedia.services.UserService;
 import lombok.Generated;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -55,7 +49,14 @@ public class TweetController {
         return tweetService.getAllRepliesFromTweet(id);
     }
 
-    @GetMapping("/{id}/context") public ContextDto getContextForTweet(@PathVariable Long id) {
+    @GetMapping("/{id}/context")
+    public ContextDto getContextForTweet(@PathVariable Long id) {
         return tweetService.getContextFromTweet(id);
     }
+
+    @PostMapping("/{id}/repost")
+    public TweetResponseDto repostTweet(@PathVariable Long id, @RequestBody CredentialsDto credentialsDto) {
+        return tweetService.createRepost(id, credentialsDto);
+    }
+
 }

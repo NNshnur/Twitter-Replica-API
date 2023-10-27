@@ -19,7 +19,16 @@ GET {{url}}/tweets/14/context
 
 ###
 
-GET {{url}}/tweets/11/tags
+POST {{url}}/tweets/15/repost
+Content-Type: application/json
+{
+  "username": "therealmc",
+  "password": "password"
+}
+
+###
+
+GET {{url}}/tweets/15/tags
 
 ###
 GET {{url}}/validate/tag/exists/mario
