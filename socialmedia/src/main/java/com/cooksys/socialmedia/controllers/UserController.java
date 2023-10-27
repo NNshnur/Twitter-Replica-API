@@ -22,11 +22,11 @@ public class UserController {
     private final ValidateService validateService;
 
 
-    @PatchMapping("/@{username}") public User updateUsername(@RequestBody CredentialsDto credentialsDto, @RequestBody ProfileDto profileDto) {
+    @PatchMapping("/@{username}") public User updateUsername(@RequestBody CredentialsDto credentialsDto, @RequestBody ProfileDto profileDto, @PathVariable String username) {
         return userService.updateUserProfile(credentialsDto, profileDto);
     }
 
-    @DeleteMapping("/@{username}") public User deleteUser(@RequestBody CredentialsDto credentialsDto) {
+    @DeleteMapping("/@{username}") public User deleteUser(@RequestBody CredentialsDto credentialsDto, @PathVariable String username) {
         return userService.deleteUser(credentialsDto);
     }
 
