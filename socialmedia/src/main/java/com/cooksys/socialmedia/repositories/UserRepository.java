@@ -8,6 +8,9 @@ import com.cooksys.socialmedia.entities.User;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
+
+    User findByCredentialsUsernameAndDeletedFalse(String username);
+
     Optional<User> findByCredentials_Username(String username);
   
     List<User> findByDeletedFalse();
