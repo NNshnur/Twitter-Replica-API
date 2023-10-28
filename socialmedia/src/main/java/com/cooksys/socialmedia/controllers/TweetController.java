@@ -16,9 +16,7 @@ import com.cooksys.socialmedia.dto.HashtagResponseDto;
 import com.cooksys.socialmedia.dto.TweetRequestDto;
 import com.cooksys.socialmedia.dto.TweetResponseDto;
 import com.cooksys.socialmedia.dto.UserResponseDto;
-import com.cooksys.socialmedia.services.HashtagService;
 import com.cooksys.socialmedia.services.TweetService;
-import com.cooksys.socialmedia.services.UserService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -29,10 +27,6 @@ import lombok.RequiredArgsConstructor;
 public class TweetController {
 
     private final TweetService tweetService;
-
-    private final UserService userService;
-
-    private final HashtagService hashtagService;
 
     @GetMapping("/{id}")
     public TweetResponseDto getTweetById(@PathVariable Long id) {

@@ -180,13 +180,21 @@ public class TweetServiceImpl implements TweetService {
         Tweet tweetToRepost = getTweet(id);
         Tweet repost = new Tweet();
         repost.setRepostOf(tweetToRepost);
+        
         User author = userRepository.findByCredentialsUsernameAndDeletedFalse(credentialsDto.getUsername());
+        if (author == null) {
+        	throw new NotFoundException("User not found");
+        }
         repost.setAuthor(author);
+        
         repost.setHashtags(tweetToRepost.getHashtags());
+        repost.setRepostOf(tweetToRepost);
+        tweetRepository.saveAndFlush(repost);
+        
         List<Tweet> reposts = tweetToRepost.getReposts();
         // may need to set more fields
-        tweetRepository.saveAndFlush(repost);
         reposts.add(repost);
+        tweetToRepost.setReposts(reposts);        
         tweetRepository.saveAndFlush(tweetToRepost);
         return tweetMapper.tweetEntityToResponseDto(repost);
     }
@@ -318,12 +326,11 @@ public class TweetServiceImpl implements TweetService {
             		// create a new hashtag and setlabel to label
             		Hashtag newTag = new Hashtag();
             		newTag.setLabel(label);
-            		//   tag.setTaggedTweets
+            		//   add tweets to new tag
             		newTag.setTweets(Collections.singletonList(tweet));
-            		//   newTweet.setTags
-            		tweet.setHashtags(Collections.singletonList(newTag));
             		hashtagRepository.saveAndFlush(newTag);
-                    tweetRepository.saveAndFlush(tweet);
+            		//   newTweet.setTags
+            		hashtags.add(newTag);
             	} else {
             		// if you don't need to create
             		//   tag.setTaggedTweets

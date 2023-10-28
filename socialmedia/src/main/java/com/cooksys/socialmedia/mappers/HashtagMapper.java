@@ -13,7 +13,7 @@ import java.util.List;
 @Mapper(componentModel="spring")
 public interface HashtagMapper {
   
-  TweetResponseDto entityToTweetResponseDto(Tweet tweet);
+	TweetResponseDto entityToTweetResponseDto(Tweet tweet);
   
 	Hashtag hashtagDtoToEntity(HashtagDto hashtagDto);
 
@@ -21,7 +21,7 @@ public interface HashtagMapper {
 
 	List<HashtagResponseDto> hashtagEntitiesToResponseDtos(List<Hashtag> entities);
 
-
+	List<TweetResponseDto> tweetEntitiesToDtos(List<Tweet> tweets);
 }
 
 
