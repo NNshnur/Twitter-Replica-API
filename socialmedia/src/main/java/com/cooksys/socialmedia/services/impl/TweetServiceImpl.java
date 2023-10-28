@@ -47,7 +47,7 @@ public class TweetServiceImpl implements TweetService {
 
     private Tweet tweetExists(Long id) {
         Optional<Tweet> optionalTweet = tweetRepository.findById(id);
-        if (optionalTweet.isEmpty()) {
+        if (optionalTweet.isEmpty() || optionalTweet == null) {
             throw new NotFoundException("Couldn't find tweet with that ID.");
         }
         return optionalTweet.get();
@@ -131,14 +131,15 @@ public class TweetServiceImpl implements TweetService {
         if (tweet.isDeleted()) {
             throw new NotFoundException("Tweet was deleted");
         }
-        List<Hashtag> allTags = hashtagRepository.findAll();
-        List<HashtagResponseDto> tagsOfTweet = new ArrayList<>();
-        for (Hashtag h : allTags) {
-            if (h.getTweets().contains(tweet)) {
-                tagsOfTweet.add(hashtagMapper.hashtagEntityToResponseDto(h));
-            }
-        }
-        return tagsOfTweet;
+//        List<Hashtag> allTags = hashtagRepository.findAll();
+//        List<HashtagResponseDto> tagsOfTweet = new ArrayList<>();
+//        for (Hashtag h : allTags) {
+//            if (h.getTweets().contains(tweet)) {
+//                tagsOfTweet.add(hashtagMapper.hashtagEntityToResponseDto(h));
+//            }
+//        }
+        List<Hashtag> allTagsTweet = tweet.getHashtags();
+        return hashtagMapper.hashtagEntitiesToResponseDtos(allTagsTweet);
     }
 
     public List<TweetResponseDto> getAllRepliesFromTweet(Long id) {
@@ -146,14 +147,8 @@ public class TweetServiceImpl implements TweetService {
         if (tweet.isDeleted()) {
             throw new NotFoundException("Tweet was deleted");
         }
-        List<Tweet> allTweets = tweetRepository.findAll();
-        List<TweetResponseDto> allReplies = new ArrayList<>();
-        for (Tweet t : allTweets) {
-            if (t.getReplies().contains(tweet) && (t.isDeleted() == false)) {
-                allReplies.add(tweetMapper.tweetEntityToResponseDto(t));
-            }
-        }
-        return allReplies;
+        List<Tweet> allReplies = tweet.getReplies();
+        return tweetMapper.entitiesToResponseDtos(allReplies);
     }
     
     public ContextDto getContextFromTweet(Long id) {
@@ -309,9 +304,11 @@ public class TweetServiceImpl implements TweetService {
                 // add tweet that user gets mentioned in to user
                 user.getMentionedTweets().add(tweet);
                 userRepository.saveAndFlush(user);
+
             }
 
             if (word.startsWith("#")) {
+
             	// take pound sign off set it equal to label
             	String label = word.substring(1);
             	// find hashtag
@@ -326,6 +323,7 @@ public class TweetServiceImpl implements TweetService {
             		//   newTweet.setTags
             		tweet.setHashtags(Collections.singletonList(newTag));
             		hashtagRepository.saveAndFlush(newTag);
+                    tweetRepository.saveAndFlush(tweet);
             	} else {
             		// if you don't need to create
             		//   tag.setTaggedTweets
@@ -352,12 +350,17 @@ public class TweetServiceImpl implements TweetService {
     public TweetResponseDto deleteTweet(Long id, CredentialsDto credentialsDto) {
     	
         Tweet tweet = tweetExists(id);
+        if (tweet == null || tweet.isDeleted()) {
+            throw new NotFoundException("Tweet was not found in the DB");
+        }
+
         String tweetAuthor = tweet.getAuthor().getCredentials().getUsername();
         String requestAuthor = credentialsDto.getUsername();
         if (!tweetAuthor.equals(requestAuthor)) {
             throw new NotAuthorizedException("You must be the owner of this tweet to delete it.");
         }
         tweet.setDeleted(true);
+
         return tweetMapper.tweetEntityToResponseDto(tweetRepository.saveAndFlush(tweet));
     }
 

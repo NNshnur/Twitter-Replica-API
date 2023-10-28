@@ -33,4 +33,5 @@ public interface UserService {
 
      List<TweetResponseDto> getUserFeed(String username);
 
+    UserResponseDto getByUsername(String username);
 }

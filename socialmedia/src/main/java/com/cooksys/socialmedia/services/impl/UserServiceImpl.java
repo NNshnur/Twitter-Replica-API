@@ -43,7 +43,7 @@ public class UserServiceImpl implements UserService {
 		if (userRequestDto.getProfile() == null || userRequestDto.getCredentials() == null) {
 			throw new BadRequestException("User must provide email, username, and password!");
 		}
-		
+
 		if (userRequestDto.getCredentials().getPassword() == null || userRequestDto.getProfile().getEmail() == null
 				|| userRequestDto.getCredentials().getUsername() == null) {
 			throw new BadRequestException("User must provide email, username, and password!");
@@ -57,7 +57,7 @@ public class UserServiceImpl implements UserService {
 		if (optionalUser.isPresent() && optionalUser.get().isDeleted() == false) {
 			throw new BadRequestException("Username is taken! Please choose another username.");
 		}
-		
+
 		if (optionalUser.isPresent() && optionalUser.get().isDeleted()) {
 			return "deleted";
 		}
@@ -85,25 +85,16 @@ public class UserServiceImpl implements UserService {
 		
 	@Override
 	public UserResponseDto createUser(UserRequestDto userRequestDto) {
-		// userName, password, email, firstName, lastName, phone
-
-		// validate given information and make sure username is unique
 		validateUserRequest(userRequestDto);
 		String username = userRequestDto.getCredentials().getUsername();
 		String usernameStatus = checkUsernameStatus(username);
 		String userRequestPassword = userRequestDto.getCredentials().getPassword();
-		
+
 		if (usernameStatus.equals("deleted")) {
 			User deletedUser = getUser(userRequestDto.getCredentials().getUsername());
-			// it says if credentials match, so i check to make sure password also matches
-			if (userRequestPassword.equals(deletedUser.getCredentials().getPassword())) {
 				deletedUser.setDeleted(false);
 				return userMapper.entityToResponseDto(userRepository.saveAndFlush(deletedUser));
-			} else {
-				throw new BadRequestException("Please enter the correct password to re-activate your account.");
-			}
 		}
-		
 		return userMapper.entityToResponseDto(userRepository.saveAndFlush(userMapper.dtoToEntity(userRequestDto)));
 	}
 
@@ -144,26 +135,32 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    public boolean usernameExists(String username) {
-        List<User> allUsers = userRepository.findAll();
-        for (User u : allUsers) {
-            if (u.getCredentials().getUsername().equals(username)) {
-                return true;
-            }
-        }
-        return false;
-    }
+//    public boolean usernameExists(String username) {
+//        List<User> allUsers = userRepository.findAll();
+//        for (User u : allUsers) {
+//            if (u.getCredentials().getUsername().equals(username)) {
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
 
     public List<TweetResponseDto> getAllTweetsByUser(String username) {
-        List<User> allUsers = userRepository.findAll();
-        for (User u : allUsers) {
-            if (u.getCredentials().getUsername().equals(username)) {
-                List<Tweet> usersTweets = u.getTweets();
-                return tweetMapper.entitiesToResponseDtos(usersTweets);
-            }
+        User userToFind = userRepository.findByCredentialsUsernameAndDeletedFalse(username);
+        if (userToFind == null) {
+            throw new NotFoundException("User not found");
         }
-       List<TweetResponseDto> tweets = new ArrayList<>();
-        return tweets;
+        List<Tweet> allTweetsByUser = userToFind.getTweets();
+        for (Tweet t : allTweetsByUser) {
+            if (t.isDeleted()) {
+                allTweetsByUser.remove(t);
+            }
+            if (!(t.getAuthor().equals(userToFind))) {
+                allTweetsByUser.remove(t);
+            }
+
+        }
+        return tweetMapper.entitiesToResponseDtos(allTweetsByUser);
     }
 
     public UserResponseDto deleteUser(CredentialsDto credentialsDto) {
@@ -178,10 +175,14 @@ public class UserServiceImpl implements UserService {
     }
 
     public UserResponseDto updateUserProfile(UserRequestDto userRequestDto, String username) {
+            if (userRequestDto.getCredentials() == null) {
+            throw new NotFoundException("Credentials empty");
+             }
             User userToUpdate =  validateCredentials(userRequestDto.getCredentials());
-            if (userToUpdate.isDeleted() || userToUpdate == null || userToUpdate.getProfile() == null ) {
+            if (userToUpdate.isDeleted() || userToUpdate == null  || userRequestDto.getProfile() == null ) {
                 throw new NotFoundException("The user is either deleted or does not exist in DB");
             }
+
             userToUpdate = userRepository.findByCredentialsUsernameAndDeletedFalse(username);
 
             Profile profileUpdate = new Profile();
@@ -278,6 +279,15 @@ public class UserServiceImpl implements UserService {
         List<TweetResponseDto> tweetDtos = tweetMapper.entitiesToResponseDtos(allTweets);
 
         return tweetDtos;
+    }
+
+    @Override
+    public UserResponseDto getByUsername(String username) {
+        User user = getUser(username);
+        if (user.isDeleted()) {
+            throw new NotFoundException("The user with username was not found");
+        }
+        return userMapper.entityToResponseDto(user);
     }
 }
 
