@@ -1,18 +1,20 @@
 package com.cooksys.socialmedia.services.impl;
 
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+
 import com.cooksys.socialmedia.dto.CredentialsDto;
-import com.cooksys.socialmedia.dto.ProfileDto;
 import com.cooksys.socialmedia.dto.TweetResponseDto;
+import com.cooksys.socialmedia.dto.UserRequestDto;
+import com.cooksys.socialmedia.dto.UserResponseDto;
 import com.cooksys.socialmedia.entities.Credentials;
 import com.cooksys.socialmedia.entities.Profile;
 import com.cooksys.socialmedia.entities.Tweet;
 import com.cooksys.socialmedia.entities.User;
-import java.util.List;
-import java.util.Optional;
-import org.springframework.stereotype.Service;
-import com.cooksys.socialmedia.dto.UserRequestDto;
-import com.cooksys.socialmedia.dto.UserResponseDto;
 import com.cooksys.socialmedia.exceptions.BadRequestException;
 import com.cooksys.socialmedia.exceptions.NotAuthorizedException;
 import com.cooksys.socialmedia.exceptions.NotFoundException;
@@ -21,11 +23,8 @@ import com.cooksys.socialmedia.mappers.UserMapper;
 import com.cooksys.socialmedia.repositories.TweetRepository;
 import com.cooksys.socialmedia.repositories.UserRepository;
 import com.cooksys.socialmedia.services.UserService;
+
 import lombok.RequiredArgsConstructor;
-import org.hibernate.Hibernate;
-import org.springframework.stereotype.Service;
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -88,12 +87,12 @@ public class UserServiceImpl implements UserService {
 		validateUserRequest(userRequestDto);
 		String username = userRequestDto.getCredentials().getUsername();
 		String usernameStatus = checkUsernameStatus(username);
-		String userRequestPassword = userRequestDto.getCredentials().getPassword();
 
 		if (usernameStatus.equals("deleted")) {
-			User deletedUser = getUser(userRequestDto.getCredentials().getUsername());
-				deletedUser.setDeleted(false);
-				return userMapper.entityToResponseDto(userRepository.saveAndFlush(deletedUser));
+			User deletedUser = getUser(username);
+//			User deletedUser = getUser(userRequestDto.getCredentials().getUsername());
+			deletedUser.setDeleted(false);
+			return userMapper.entityToResponseDto(userRepository.saveAndFlush(deletedUser));
 		}
 		return userMapper.entityToResponseDto(userRepository.saveAndFlush(userMapper.dtoToEntity(userRequestDto)));
 	}
@@ -170,13 +169,13 @@ public class UserServiceImpl implements UserService {
         }
         userToDelete.setDeleted(true);
 
-        return userMapper.entityToResponseDto(userToDelete);
+        return userMapper.entityToResponseDto(userRepository.saveAndFlush(userToDelete));
 
     }
 
     public UserResponseDto updateUserProfile(UserRequestDto userRequestDto, String username) {
             if (userRequestDto.getCredentials() == null) {
-            throw new NotFoundException("Credentials empty");
+            	throw new NotFoundException("Credentials empty");
              }
             User userToUpdate =  validateCredentials(userRequestDto.getCredentials());
             if (userToUpdate.isDeleted() || userToUpdate == null  || userRequestDto.getProfile() == null ) {
@@ -186,10 +185,26 @@ public class UserServiceImpl implements UserService {
             userToUpdate = userRepository.findByCredentialsUsernameAndDeletedFalse(username);
 
             Profile profileUpdate = new Profile();
-            profileUpdate.setEmail(userRequestDto.getProfile().getEmail());
-            profileUpdate.setFirstName(userRequestDto.getProfile().getFirstName());
-            profileUpdate.setLastName(userRequestDto.getProfile().getLastName());
-            profileUpdate.setPhone(userRequestDto.getProfile().getPhone());
+            if (userRequestDto.getProfile().getEmail() != null) {
+            	profileUpdate.setEmail(userRequestDto.getProfile().getEmail());
+            } else {
+            	profileUpdate.setEmail(getUser(userRequestDto.getCredentials().getUsername()).getProfile().getEmail());
+            }
+            if (userRequestDto.getProfile().getFirstName() != null) {
+            	profileUpdate.setFirstName(userRequestDto.getProfile().getFirstName());
+            } else {
+            	profileUpdate.setFirstName(getUser(userRequestDto.getCredentials().getUsername()).getProfile().getFirstName());
+            }
+            if (userRequestDto.getProfile().getLastName() != null) {
+            	profileUpdate.setLastName(userRequestDto.getProfile().getLastName());
+            } else {
+            	profileUpdate.setLastName(getUser(userRequestDto.getCredentials().getUsername()).getProfile().getLastName());
+            }
+            if (userRequestDto.getProfile().getPhone() != null) {
+            	profileUpdate.setPhone(userRequestDto.getProfile().getPhone());
+            } else {
+            	profileUpdate.setPhone(getUser(userRequestDto.getCredentials().getUsername()).getProfile().getPhone());
+            }
 
             userToUpdate.setProfile(profileUpdate);
             Credentials credentialsUpdate = new Credentials();
