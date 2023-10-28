@@ -19,6 +19,7 @@ import com.cooksys.socialmedia.repositories.UserRepository;
 import com.cooksys.socialmedia.services.TweetService;
 import lombok.RequiredArgsConstructor;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -57,8 +58,8 @@ public class TweetServiceImpl implements TweetService {
             throw new BadRequestException("Tweet must have content and an author");
         }
 
-        if (tweetRequestDto.getCredentials().getUsername() == null) {
-            throw new BadRequestException("Tweet must have an author (username).");
+        if (tweetRequestDto.getCredentials().getUsername() == null || tweetRequestDto.getCredentials().getPassword() == null) {         
+        	throw new BadRequestException("Tweet must have an author (username).");
         }
     }
 
@@ -78,14 +79,8 @@ public class TweetServiceImpl implements TweetService {
             throw new NotFoundException("User not found.");
         }
         return optionalUser.get();
-    }
-
-    private Hashtag getHashtag(String label) {
-        System.out.println(label);
-        Optional<Hashtag> optionalHashtag = hashtagRepository.findByLabel(label);
-
-        return optionalHashtag.get();
-    }
+    }    
+    
     private Tweet getTweet(Long id) {
         Optional<Tweet> tweet = tweetRepository.findById(id);
         if (tweet.isEmpty()) {
@@ -93,6 +88,7 @@ public class TweetServiceImpl implements TweetService {
         }
         return tweet.get();
     }
+    
     public TweetResponseDto findById(Long Id) {
         List<Tweet> allTweets = tweetRepository.findAll();
         for (Tweet t : allTweets) {
@@ -159,6 +155,7 @@ public class TweetServiceImpl implements TweetService {
         }
         return allReplies;
     }
+    
     public ContextDto getContextFromTweet(Long id) {
         Tweet tweet = getTweet(id);
         if (tweet.isDeleted() || tweet == null) {
@@ -283,6 +280,10 @@ public class TweetServiceImpl implements TweetService {
 
     @Override
     public TweetResponseDto createTweet(TweetRequestDto tweetRequestDto) {
+    	// find user and makes sure not deleted
+    	// set author
+    	
+    
         // validate request
         validateTweetRequest(tweetRequestDto);
 
@@ -292,6 +293,7 @@ public class TweetServiceImpl implements TweetService {
             throw new NotFoundException("Author not found.");
         }
 
+        // convert tweet into entity
         Tweet tweet = tweetMapper.dtoToEntity(tweetRequestDto);
 
         // get content, parse through it for mentions and hashtags
@@ -299,20 +301,48 @@ public class TweetServiceImpl implements TweetService {
         List<User> mentionedUsers = new ArrayList<>();
         List<Hashtag> hashtags = new ArrayList<>();
         for (String word : splitContent) {
-
             if (word.startsWith("@")) {
                 String username = word.substring(1);
-                mentionedUsers.add(getUser(username));
+                User user = getUser(username);
+                // add a mentioned user to our mentionedUsers array
+                mentionedUsers.add(user);
+                // add tweet that user gets mentioned in to user
+                user.getMentionedTweets().add(tweet);
+                userRepository.saveAndFlush(user);
             }
 
             if (word.startsWith("#")) {
-                Hashtag hashtag = getHashtag(word);
-                hashtags.add(hashtag);
+            	// take pound sign off set it equal to label
+            	String label = word.substring(1);
+            	// find hashtag
+            	Hashtag hashtag = hashtagRepository.findByLabel(label);
+            	// see if it exists
+            	if (hashtag == null) {
+            		// create a new hashtag and setlabel to label
+            		Hashtag newTag = new Hashtag();
+            		newTag.setLabel(label);
+            		//   tag.setTaggedTweets
+            		newTag.setTweets(Collections.singletonList(tweet));
+            		//   newTweet.setTags
+            		tweet.setHashtags(Collections.singletonList(newTag));
+            		hashtagRepository.saveAndFlush(newTag);
+            	} else {
+            		// if you don't need to create
+            		//   tag.setTaggedTweets
+            		hashtag.setTweets(Collections.singletonList(tweet));
+            		//   ?? newTweet.setTags ??
+            		hashtags.add(hashtag);
+            		
+            		hashtagRepository.saveAndFlush(hashtag);
+            		
+            	}
 
+            	// saveandflush the tag
             }
         }
         tweet.setMentionedUsers(mentionedUsers);
         tweet.setHashtags(hashtags);
+        tweet.setAuthor(getUser(authorUsername));
 
         // need to update lastused timestamp for hashtag
         return tweetMapper.tweetEntityToResponseDto(tweetRepository.saveAndFlush(tweet));
@@ -320,6 +350,7 @@ public class TweetServiceImpl implements TweetService {
 
     @Override
     public TweetResponseDto deleteTweet(Long id, CredentialsDto credentialsDto) {
+    	
         Tweet tweet = tweetExists(id);
         String tweetAuthor = tweet.getAuthor().getCredentials().getUsername();
         String requestAuthor = credentialsDto.getUsername();

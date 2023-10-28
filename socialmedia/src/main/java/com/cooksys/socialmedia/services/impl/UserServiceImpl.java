@@ -31,13 +31,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 	
-  private final UserRepository userRepository;
+    private final UserRepository userRepository;
 
 	private final UserMapper userMapper;
 	
 	private final TweetMapper tweetMapper;
   
-  private final TweetRepository tweetRepository;
+    private final TweetRepository tweetRepository;
   
 	private void validateUserRequest(UserRequestDto userRequestDto) {
 		if (userRequestDto.getProfile() == null || userRequestDto.getCredentials() == null) {
