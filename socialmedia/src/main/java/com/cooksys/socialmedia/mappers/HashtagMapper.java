@@ -20,8 +20,6 @@ public interface HashtagMapper {
 	HashtagResponseDto hashtagEntityToResponseDto(Hashtag entity);
 
 	List<HashtagResponseDto> hashtagEntitiesToResponseDtos(List<Hashtag> entities);
-
-	List<TweetResponseDto> tweetEntitiesToDtos(List<Tweet> tweets);
 }
 
 

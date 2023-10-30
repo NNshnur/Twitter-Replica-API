@@ -1,6 +1,22 @@
 package com.cooksys.socialmedia.services.impl;
 
-import com.cooksys.socialmedia.dto.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+
+import com.cooksys.socialmedia.dto.ContextDto;
+import com.cooksys.socialmedia.dto.CredentialsDto;
+import com.cooksys.socialmedia.dto.HashtagResponseDto;
+import com.cooksys.socialmedia.dto.TweetRequestDto;
+import com.cooksys.socialmedia.dto.TweetResponseDto;
+import com.cooksys.socialmedia.dto.UserResponseDto;
 import com.cooksys.socialmedia.entities.Hashtag;
 import com.cooksys.socialmedia.entities.Tweet;
 import com.cooksys.socialmedia.entities.User;
@@ -11,21 +27,11 @@ import com.cooksys.socialmedia.mappers.HashtagMapper;
 import com.cooksys.socialmedia.mappers.TweetMapper;
 import com.cooksys.socialmedia.mappers.UserMapper;
 import com.cooksys.socialmedia.repositories.HashtagRepository;
-import com.cooksys.socialmedia.dto.TweetRequestDto;
-import com.cooksys.socialmedia.dto.UserResponseDto;
-import org.springframework.stereotype.Service;
 import com.cooksys.socialmedia.repositories.TweetRepository;
 import com.cooksys.socialmedia.repositories.UserRepository;
 import com.cooksys.socialmedia.services.TweetService;
+
 import lombok.RequiredArgsConstructor;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.sql.Timestamp;
 
 
 
@@ -122,8 +128,6 @@ public class TweetServiceImpl implements TweetService {
         }
 
         return usersWhoLikedTweet;
-
-
     }
 
     public List<HashtagResponseDto> getAllTagsFromTweet(Long id) {
@@ -153,23 +157,31 @@ public class TweetServiceImpl implements TweetService {
     
     public ContextDto getContextFromTweet(Long id) {
         Tweet tweet = getTweet(id);
-        if (tweet.isDeleted() || tweet == null) {
+        if (tweet.isDeleted()) {
             throw new NotFoundException("Tweet was deleted");
         }
+        
         ContextDto tweetContext = new ContextDto();
         List<TweetResponseDto> beforeList = new ArrayList<>();
         List<TweetResponseDto> afterList = new ArrayList<>();
-        Timestamp targetTimestamp = tweet.getPosted();
+        //find all tweets in response and reply to given tweet
+        
+        Tweet isAReply = tweet.getInReplyTo();        
+        if (Objects.nonNull(isAReply)) {
+        	beforeList.add(tweetMapper.tweetEntityToResponseDto(isAReply));
+        }
+        
         List<Tweet> allTweets = tweetRepository.findAll();
         for (Tweet t : allTweets) {
-            Timestamp timestamp = t.getPosted();
-            if (timestamp.compareTo(targetTimestamp) < 0 && (t.isDeleted() == false)) {
-                beforeList.add(tweetMapper.tweetEntityToResponseDto(t));
-            }
-            if (timestamp.compareTo(targetTimestamp) > 0 && (t.isDeleted() == false)) {
+        	if (t.getInReplyTo() == null) {
+        		continue;
+        	}
+        	
+            if (t.getInReplyTo().equals(tweet)) {
                 afterList.add(tweetMapper.tweetEntityToResponseDto(t));
             }
         }
+        
         tweetContext.setTarget(tweetMapper.tweetEntityToResponseDto(tweet));
         tweetContext.setAfter(afterList);
         tweetContext.setBefore(beforeList);
@@ -178,6 +190,11 @@ public class TweetServiceImpl implements TweetService {
 
     public TweetResponseDto createRepost(Long id, CredentialsDto credentialsDto) {
         Tweet tweetToRepost = getTweet(id);
+        
+        if (tweetToRepost.isDeleted()) {
+        	throw new NotFoundException("Tweet not found");	
+        }
+        
         Tweet repost = new Tweet();
         repost.setRepostOf(tweetToRepost);
         
@@ -185,9 +202,11 @@ public class TweetServiceImpl implements TweetService {
         if (author == null) {
         	throw new NotFoundException("User not found");
         }
-        repost.setAuthor(author);
         
-        repost.setHashtags(tweetToRepost.getHashtags());
+        List<Hashtag> tweetToRepostHashtags = new ArrayList<>(tweetToRepost.getHashtags());
+        
+        repost.setAuthor(author);
+        repost.setHashtags(tweetToRepostHashtags);
         repost.setRepostOf(tweetToRepost);
         tweetRepository.saveAndFlush(repost);
         
@@ -277,7 +296,6 @@ public class TweetServiceImpl implements TweetService {
 
     @Override
     public List<TweetResponseDto> getAllTweets() {
-        System.out.println("hello");
         return tweetMapper.entitiesToResponseDtos(tweetRepository.findAll());
     }
 
@@ -345,6 +363,7 @@ public class TweetServiceImpl implements TweetService {
             	// saveandflush the tag
             }
         }
+        
         tweet.setMentionedUsers(mentionedUsers);
         tweet.setHashtags(hashtags);
         tweet.setAuthor(getUser(authorUsername));
@@ -388,13 +407,6 @@ public class TweetServiceImpl implements TweetService {
         user.getLikedTweets().add(tweet);
         userRepository.saveAndFlush(user);
     }
-
-
-
-
-
-
-
 
 }
 
